@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <thres>30</thres>
+  <dthres>9</dthres>
+  <det_thres>10</det_thres>
+  <det_miss_thre>12</det_miss_thre>
+  <mv_thres>10</mv_thres>
+  <fb>4</fb>
+  <ff>30</ff>
+  <lhp>5</lhp>
+  <trough_thre>15</trough_thre>
+  <tail_thres>2</tail_thres>
+  <tail_len>3</tail_len>
+  <tailn_thres>3</tailn_thres>
+  <head_thres>2</head_thres>
+  <head_len>3</head_len>
+  <headln_thres>2</headln_thres>
+</configuration>
