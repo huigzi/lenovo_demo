@@ -19,11 +19,15 @@ namespace UI
     public partial class MainWindow : Window
     {
         private readonly MusicPlayer musicPlayer;
-        private UsbServer usbServer;
+        private readonly UsbServer usbServer;
+        private readonly Logger logger;
+        private int lampFlag = 0;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            logger = new Logger();
 
             musicPlayer = new MusicPlayer();
             musicPlayer.PlayerInitial("134");
@@ -36,6 +40,15 @@ namespace UI
             var transformBlock = new TransformBlock<byte[], ArrayList>(x => process.DataProcess(x));
             var actionBlock = new ActionBlock<ArrayList>(x =>
             {
+                lampFlag = 1 - lampFlag;
+
+                Dispatcher?.InvokeAsync(() =>
+                {
+                    RecvLamp.Background = lampFlag == 1
+                        ? new SolidColorBrush(Color.FromRgb(255, 255, 0))
+                        : new SolidColorBrush(Color.FromRgb(0, 255, 255));
+                });
+
                 if ((State) x[0] == statusMachine.LastState) return;
                 statusMachine.LastState = (State) x[0];
                 StateChangeUi(x);
@@ -64,6 +77,7 @@ namespace UI
                         if (res == -1)
                         {
                             MessageBox.Show("USB Device Not Find.");
+                            logger.WriteToLog("USB Device Not Find.");
                             return;
                         }
                     }
@@ -74,6 +88,7 @@ namespace UI
 
         private void Window_Closing(object sender, EventArgs e)
         {
+            logger.ShutDown();
             usbServer.CloseUsb();
             Environment.Exit(0);
         }
@@ -83,17 +98,20 @@ namespace UI
             switch ((State)arrayList[0])
             {
                 case State.NoOne:
-                    Dispatcher?.Invoke(() => { Screen.Visibility = Visibility.Visible; });
+                    Dispatcher?.InvokeAsync(() => { Screen.Visibility = Visibility.Visible; });
                     break;
 
                 case State.SomeOne:
-                    Dispatcher?.Invoke(() => { Screen.Visibility = Visibility.Hidden; });
+                    Dispatcher?.InvokeAsync(() => { Screen.Visibility = Visibility.Hidden; });
                     break;
 
                 case State.DoubleClick:
 
-                    Dispatcher?.Invoke(() =>
+                    Dispatcher?.InvokeAsync(() =>
                     {
+                        Rline.PlotY((IEnumerable)arrayList[1]);
+                        Sline.PlotY((IEnumerable)arrayList[2]);
+
                         switch (musicPlayer.CurrentStatus)
                         {
                             case PlayerState.Start:
@@ -119,60 +137,80 @@ namespace UI
                                 break;
                         }
 
-                        Rline.PlotY((IEnumerable)arrayList[1]);
-                        Sline.PlotY((IEnumerable)arrayList[2]);
                     });
                     break;
 
                 case State.Circle:
 
-                    Dispatcher?.Invoke(() =>
+                    Dispatcher?.InvokeAsync(() =>
                     {
-                        musicPlayer.UpdateVolume();
-                        Pb.Value = musicPlayer.Volume;
                         Rline.PlotY((IEnumerable)arrayList[1]);
                         Sline.PlotY((IEnumerable)arrayList[2]);
+
+                        musicPlayer.UpdateVolume();
+                        Pb.Value = musicPlayer.Volume;
                     });
                     break;
 
                 case State.LeftSweep:
 
-                    Dispatcher?.Invoke(() =>
+                    Dispatcher?.InvokeAsync(() =>
                     {
                         musicPlayer.ListLeft();
-                        musicPlayer.Index = 1;
-
-                        if (musicPlayer.CurrentStatus == PlayerState.Start)
-                        {
-                            musicPlayer.Stop();
-                            musicPlayer.Play();
-                        }
 
                         LastM.Content = musicPlayer.MusicList[0];
                         CurrentM.Content = musicPlayer.MusicList[1];
                         NextM.Content = musicPlayer.MusicList[2];
                         Rline.PlotY((IEnumerable)arrayList[1]);
                         Sline.PlotY((IEnumerable)arrayList[2]);
+
+                        switch (musicPlayer.CurrentStatus)
+                        {
+                            case PlayerState.Start:
+                                musicPlayer.Stop();
+                                musicPlayer.Index = 1;
+                                musicPlayer.Play();
+                                break;
+                            case PlayerState.Pause:
+                                musicPlayer.Stop();
+                                musicPlayer.CurrentStatus = PlayerState.Stop;
+                                break;
+                        }
                     });
 
                     break;
 
                 case State.RightSweep:
 
-                    Dispatcher?.Invoke(() =>
+                    Dispatcher?.InvokeAsync(() =>
                     {
                         musicPlayer.ListRight();
-                        musicPlayer.Index = 1;
-
-                        if (musicPlayer.CurrentStatus == PlayerState.Start)
-                        {
-                            musicPlayer.Stop();
-                            musicPlayer.Play();
-                        }
 
                         LastM.Content = musicPlayer.MusicList[0];
                         CurrentM.Content = musicPlayer.MusicList[1];
                         NextM.Content = musicPlayer.MusicList[2];
+                        Rline.PlotY((IEnumerable)arrayList[1]);
+                        Sline.PlotY((IEnumerable)arrayList[2]);
+
+                        switch (musicPlayer.CurrentStatus)
+                        {
+                            case PlayerState.Start:
+                                musicPlayer.Stop();
+                                musicPlayer.Index = 1;
+                                musicPlayer.Play();
+                                break;
+                            case PlayerState.Pause:
+                                musicPlayer.Stop();
+                                musicPlayer.CurrentStatus = PlayerState.Stop;
+                                break;
+                        }
+                    });
+                    break;
+
+                case State.OtherGesture:
+                    
+                    Dispatcher?.InvokeAsync(() =>
+                    {
                         Rline.PlotY((IEnumerable)arrayList[1]);
                         Sline.PlotY((IEnumerable)arrayList[2]);
                     });

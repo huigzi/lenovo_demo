@@ -17,7 +17,7 @@ namespace Algorithm
         private readonly int fb;
         private readonly int ff;
 
-        private ArrayList result;
+        private readonly ArrayList result;
 
         private State currentState = State.SomeOne;
 

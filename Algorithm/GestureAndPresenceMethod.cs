@@ -148,15 +148,8 @@ namespace Algorithm
 
             Parallel.For(0, res1.Count, i =>
             {
-                if (res1[i] > 0)
-                {
-                    detNumR1++;
-                }
-
-                if (res2[i] > 0)
-                {
-                    detNumR2++;
-                }
+                if (res1[i] > 0) detNumR1++;
+                if (res2[i] > 0) detNumR2++;
 
             });
 
@@ -176,21 +169,13 @@ namespace Algorithm
 
             Parallel.For(0, res1.Count, i =>
             {
-                if (res1[i] > 0)
-                {
-                    detNumR1++;
-                }
-
-                if (res2[i] > 0)
-                {
-                    detNumR2++;
-                }
+                if (res1[i] > 0) detNumR1++;
+                if (res2[i] > 0) detNumR2++;
             });
 
             if (detNumR1 > det_thres)
             {
                 var temp1 = res1.OrderByDescending(x => x).ToList();
-
                 double diff1 = Math.Abs(temp1[1] - temp1[detNumR1 - 2]);
 
                 if (diff1 < mv_thres)
@@ -202,7 +187,6 @@ namespace Algorithm
             if (detNumR2 > det_thres)
             {
                 var temp2 = res2.OrderByDescending(x => x).ToList();
-
                 double diff2 = Math.Abs(temp2[1] - temp2[detNumR2 - 2]);
 
                 if (diff2 < mv_thres)
@@ -219,7 +203,6 @@ namespace Algorithm
             var result = new List<float>();
             float sum = 0f;
             
-
             for (int i = 0; i < data.Count - times + 1; i++)
             {
                 sum = data.GetRange(i, times).Sum();

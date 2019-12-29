@@ -21,13 +21,6 @@ namespace Core
 
         public void PlayerInitial(string path)
         {
-            //var files = Directory.GetFiles(path, "*.wav");
-
-            //foreach (var file in files)
-            //{
-            //    MusicList.Add(file);
-            //}
-
             MusicList.Add("music1.wav");
             MusicList.Add("music2.wav");
             MusicList.Add("music3.wav");
@@ -36,7 +29,6 @@ namespace Core
             wavePlay.Init(new AudioFileReader(MusicList[0]));
 
             Volume = 0.2f;
-
         }
 
         public void ListLeft()

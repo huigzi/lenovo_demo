@@ -27,12 +27,7 @@ namespace Core
     public class StatusMachine
     {
         public State LastState { get; set; }
-
-        public StatusMachine()
-        {
-            LastState = State.SomeOne;
-        }
-
+        public StatusMachine() => LastState = State.SomeOne;
     }
 
 }
