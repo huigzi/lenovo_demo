@@ -19,7 +19,7 @@ namespace Core
             CurrentStatus = PlayerState.Stop;
         }
 
-        public void PlayerInitial(string path)
+        public void PlayerInitial()
         {
             MusicList.Add("music1.wav");
             MusicList.Add("music2.wav");

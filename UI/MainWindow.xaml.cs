@@ -30,8 +30,7 @@ namespace UI
             logger = new Logger();
 
             musicPlayer = new MusicPlayer();
-            musicPlayer.PlayerInitial("134");
-
+            musicPlayer.PlayerInitial();
 
             var readXml = new ReadXml();
             var process = new Process(new GestureAndPresenceMethod(readXml), readXml);
