@@ -69,7 +69,8 @@
                         <ColumnDefinition Width="8*"/>
                     </Grid.ColumnDefinitions>
                     <Label x:Name="RecvLamp" Grid.Column="3" Background="Green"/>
-                        <!--<Button x:Name="Button1" Grid.Column="1" Click="button1_Click"/>
+                    <Button x:Name="SaveDataButton" Grid.Column="5" Content="数据保存" Click="SaveDataButton_Click"/>
+                    <!--<Button x:Name="Button1" Grid.Column="1" Click="button1_Click"/>
                     <Button x:Name="Button2" Grid.Column="3" Click="button2_Click"/>
                     <Button x:Name="Button3" Grid.Column="5" Click="button3_Click"/>
                     <Button x:Name="Button4" Grid.Column="6" Click="button4_Click"/>-->
