@@ -30,6 +30,9 @@ namespace UI
 
             logger = new Logger();
 
+            logger.WriteToConsole("Start");
+            logger.WriteToLog("Start");
+
             musicPlayer = new MusicPlayer();
             musicPlayer.PlayerInitial();
 

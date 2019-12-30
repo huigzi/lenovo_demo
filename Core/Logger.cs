@@ -8,13 +8,13 @@ namespace Core
 {
     public class Logger
     {
-        private readonly NLog.Logger logger;
+        private static NLog.Logger _logger;
 
-        public Logger() => logger = NLog.LogManager.GetCurrentClassLogger();
+        public Logger() => _logger = NLog.LogManager.GetCurrentClassLogger();
+
+        public void WriteToLog(string msg) => _logger.Debug(msg);
         
-        public void WriteToLog(string msg) => logger.Debug(msg);
-        
-        public void WriteToConsole(string msg) => logger.Info(msg);
+        public void WriteToConsole(string msg) => _logger.Info(msg);
         
         public void ShutDown() => NLog.LogManager.Shutdown();
     }

@@ -71,7 +71,9 @@
     <Compile Include="UsbServer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="NLog.config" />
+    <None Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

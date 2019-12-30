@@ -39,13 +39,10 @@ namespace Core
             if (regList.Count == 0) return;
 
             myUsbDevice = UsbDevice.OpenUsbDevice(myUsbFinder);
-            IUsbDevice wholeUsbDevice = myUsbDevice as IUsbDevice;
+            var wholeUsbDevice = myUsbDevice as IUsbDevice;
 
-            if (!(wholeUsbDevice is null))
-            {
-                wholeUsbDevice.SetConfiguration(1);
-                wholeUsbDevice.ClaimInterface(0);
-            }
+            wholeUsbDevice?.SetConfiguration(1);
+            wholeUsbDevice?.ClaimInterface(0);
 
             reader = myUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01);
             reader.DataReceived += OnRxEndPointData;
