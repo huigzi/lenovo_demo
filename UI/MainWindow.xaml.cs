@@ -30,9 +30,6 @@ namespace UI
 
             logger = new Logger();
 
-            logger.WriteToConsole("Start");
-            logger.WriteToLog("Start");
-
             musicPlayer = new MusicPlayer();
             musicPlayer.PlayerInitial();
 
@@ -43,6 +40,7 @@ namespace UI
             var statusMachine = new StatusMachine();
 
             var transformBlock1 = new TransformBlock<byte[], byte[]>(x => saveData.WriteData(x));
+
             var transformBlock2 = new TransformBlock<byte[], ArrayList>(x => process.DataProcess(x));
             var actionBlock = new ActionBlock<ArrayList>(x =>
             {
@@ -53,7 +51,15 @@ namespace UI
                     RecvLamp.Background = lampFlag == 1
                         ? new SolidColorBrush(Color.FromRgb(255, 255, 0))
                         : new SolidColorBrush(Color.FromRgb(0, 255, 255));
+
+                    if((State) x[0] == State.SomeOne)
+                    {
+                        Rline.PlotY(x[1] as IEnumerable);
+                        Sline.PlotY(x[2] as IEnumerable);
+                    }
+
                 });
+
 
                 if ((State) x[0] == statusMachine.LastState) return;
                 statusMachine.LastState = (State) x[0];
@@ -109,7 +115,10 @@ namespace UI
 
                 case State.SomeOne:
 
-                    Dispatcher?.InvokeAsync(() => { Screen.Visibility = Visibility.Hidden; });
+                    Dispatcher?.InvokeAsync(() =>
+                    {
+                        Screen.Visibility = Visibility.Hidden;
+                    });
                     break;
 
                 case State.DoubleClick:
@@ -183,6 +192,8 @@ namespace UI
                                 musicPlayer.CurrentStatus = PlayerState.Stop;
                                 break;
                         }
+
+                        logger.WriteToLog("LeftSweep");
                     });
 
                     break;
@@ -211,6 +222,8 @@ namespace UI
                                 musicPlayer.CurrentStatus = PlayerState.Stop;
                                 break;
                         }
+
+                        logger.WriteToLog("RightSweep");
                     });
                     break;
 

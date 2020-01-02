@@ -47,13 +47,13 @@ namespace Core
         {
             if (wavePlay == null) return;
 
-            wavePlay.Volume += 0.2f;
-            Volume += 0.2f;
+            //wavePlay.Volume += 0.2f;
+            //Volume += 0.2f;
 
-            if (wavePlay.Volume > 0.8f)
+            if (Volume > 0.8f)
             {
-                wavePlay.Volume = 0.2f;
-                Volume = 0.2f;
+            //    wavePlay.Volume = 0.2f;
+            //    Volume = 0.2f;
             }
         }
 

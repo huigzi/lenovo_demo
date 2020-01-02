@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <configuration>
-  <thres>30</thres>
-  <dthres>20</dthres>
+  <thres>15</thres>
+  <dthres>15</dthres>
   <det_thres>15</det_thres>
   <det_miss_thre>12</det_miss_thre>
   <mv_thres>10</mv_thres>

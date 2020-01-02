@@ -16,6 +16,7 @@ namespace Algorithm
         private readonly int det_miss_thre;
         private readonly int fb;
         private readonly int ff;
+        private readonly int lhp;
 
         private readonly ArrayList result;
 
@@ -25,6 +26,7 @@ namespace Algorithm
         private readonly List<float> res2;
         private readonly List<float> r;
         private readonly List<float> theta;
+        private  List<float> gestureSmooth;
 
         private readonly GestureAndPresenceMethod gestureAndPresenceMethod;
 
@@ -37,11 +39,13 @@ namespace Algorithm
             det_miss_thre = list[3];
             fb = list[5];
             ff = list[6];
+            lhp = list[7];
 
             res1 = new List<float>();
             res2 = new List<float>();
             r = new List<float>();
             theta = new List<float>();
+            gestureSmooth = new List<float>();
         }
 
         public ArrayList DataProcess(byte[] bytes)
@@ -55,7 +59,7 @@ namespace Algorithm
 
             if (startFrameCountNum >= 2)
             {
-                gestureAndPresenceMethod.Detection(tmpTuple, res1, res2, r, theta);
+                gestureAndPresenceMethod.Detection(tmpTuple, res1, res2, r, theta); //res1 re2 r theta每帧add
             }
             else
             {
@@ -90,6 +94,7 @@ namespace Algorithm
 
                         r.Clear();
                         theta.Clear();
+
                         gestureFrameCountNum = 0;
                     }
                 }
@@ -102,9 +107,9 @@ namespace Algorithm
 
             if (currentState == State.SomeOne)
             {
-                if (Math.Abs(r.Last()) > 10e-15)
+                if (r.Last() > 0)
                 {
-                    if (gestureFrameCountNum < fb + ff + 1)
+                    if (gestureFrameCountNum < fb + ff + 1 + lhp + 3)
                     {
                         gestureFrameCountNum++;
                     }
@@ -118,21 +123,23 @@ namespace Algorithm
                 {
                     r.RemoveAt(r.Count - 1);
                     theta.RemoveAt(theta.Count - 1);
+
                 }
 
-                if (gestureFrameCountNum >= fb + ff + 1)
+                if (gestureFrameCountNum >= fb + ff + 1 + lhp + 3)
                 {
-                    currentState = gestureAndPresenceMethod.NoneToGesture(r, theta);
+                    result[1] = new ArrayList(r);
+
+                    currentState = gestureAndPresenceMethod.NoneToGesture(r, theta, ref gestureSmooth);
 
                     if (currentState != State.NoOne && currentState != State.SomeOne)
                     {
-                        result[1] = new ArrayList(r);
-                        result[2] = gestureAndPresenceMethod.Smooth(r, 7);
-
                         r.Clear();
                         theta.Clear();
                         gestureFrameCountNum = 0;
                     }
+
+                    result[2] = new ArrayList(gestureSmooth);
                 }
             }
             else if (currentState == State.NoOne)
@@ -141,6 +148,7 @@ namespace Algorithm
                 {
                     r.RemoveAt(r.Count - 1);
                     theta.RemoveAt(theta.Count - 1);
+
                 }
             }
 

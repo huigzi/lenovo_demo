@@ -80,10 +80,9 @@ namespace Algorithm
             return new Tuple<List<short[]>, List<short[]>>(ch1, ch2);
         }
 
-        private float RangeDetector(IList<short> temp)
+        private float RangeDetector(IList<short> temp, int thresArg)
         {
             float[,] wi = new float[2, 3] {{0f, 0f, 0f}, {0f, 0f, 0f}};
-            float[,] wb = new float[2, 3] {{0f, 0f, 0f}, {0f, 0f, 0f}};
             float[] env = new float[3] {0f, 0f, 0f};
             short temp2 = 0;
 
@@ -100,6 +99,10 @@ namespace Algorithm
                 {
                     temp2 = (short)(-1 * temp[i]);
                 }
+                else
+                {
+                    temp2 = temp[i];
+                }
 
                 wi[0, 0] = temp2 - a1[1] * wi[0, 1] - a1[2] * wi[0, 2];
                 var y = b1[0] * wi[0, 0] + b1[1] * wi[0, 1] + b1[2] * wi[0, 2];
@@ -110,8 +113,8 @@ namespace Algorithm
                 wi[1, 0] = y - a2[1] * wi[1, 1] - a2[2] * wi[1, 2];
                 env[2] = b2[0] * wi[1, 0] + b2[1] * wi[1, 1] + b2[2] * wi[1, 2];
 
-                if (env[2] <= dthres) continue;
-                if (env[2] > env[1] && env[2] > env[0])
+                if (env[1] <= thresArg) continue;
+                if (env[1] > env[2] && env[1] > env[0])
                 {
                     return i * es;
                 }
@@ -131,14 +134,21 @@ namespace Algorithm
             var subFrame2 = new short[2700];
             Parallel.For(0, 2700, i => { subFrame1[i] = (short) (ch2Data[2][i] * 2 - ch2Data[0][i] - ch2Data[1][i]); });
 
-            res1.Add(RangeDetector(subFrame1));
-            res2.Add(RangeDetector(subFrame2));
-            var res3 = RangeDetector(ch1Data[2]);
-            var res4 = RangeDetector(ch2Data[2]);
+            res1.Add(RangeDetector(subFrame1, dthres));
+            res2.Add(RangeDetector(subFrame2, dthres));
+            var res3 = RangeDetector(ch1Data[2],thres);
+            var res4 = RangeDetector(ch2Data[2],thres);
 
-            r.Add((res3 + res4) / 2);
-            theta.Add(res3 - res4);
-
+            if (res3 > 0 && res4 > 0)
+            {
+                r.Add((res3 + res4) / 2);
+                theta.Add(res3 - res4);
+            }
+            else
+            {
+                r.Add(-1);
+                theta.Add(-1);
+            }
         }
 
         public State PresenceToNone(List<float> res1, List<float> res2)
@@ -198,30 +208,38 @@ namespace Algorithm
             return flag > 0 ? State.SomeOne : State.NoOne;
         }
 
-        public List<float> Smooth(List<float> data, int times)
+        public List<float> Smooth(List<float> data, int times = 7)
         {
-            var result = new List<float>();
-            float sum = 0f;
-            
-            for (int i = 0; i < data.Count - times + 1; i++)
+            var result = new List<float>
+                {data[0], data.GetRange(0, 3).Sum() / 3, data.GetRange(0, 5).Sum() / 5};
+
+            for (int i = 3; i < data.Count - 3; i++)
             {
-                sum = data.GetRange(i, times).Sum();
+                var sum = data.GetRange(i - 3, times).Sum();
                 result.Add(sum / times);
             }
 
-            for (int i = 0; i < times - 1; i++)
-            {
-                result.Add(sum / times);
-            }
+            result.Add(data.GetRange(data.Count - 5, 5).Sum() / 5);
+            result.Add(data.GetRange(data.Count - 3, 3).Sum() / 3);
+            result.Add(data[data.Count - 1]);
 
             return result;
+
         }
 
-        public State NoneToGesture(List<float> r, List<float> theta)
+        public State NoneToGesture(List<float> r, List<float> theta, ref List<float> gestureOutput)
         {
 
             float hdiffJu = 0;
-            var gestureSmooth = Smooth(r, 7);
+
+            var mean = r.GetRange(0, lhp).Sum() / lhp;
+
+            if (r[lhp + 2] > mean - trough_thre)
+            {
+                return State.SomeOne;
+            }
+
+            var gestureSmooth = Smooth(r).GetRange(lhp + 2, fb + ff + 1);
 
             for (int i = 0; i < head_len; i++)
             {
@@ -247,14 +265,17 @@ namespace Algorithm
                         int np = 0;
 
                         var gestT = new List<float>(theta.GetRange(1, i - 1));
+                        gestureOutput = gestureSmooth.GetRange(1, i - 1);
 
                         for (int k = 2; k < i - 2; k++)
                         {
-                            if (gestureSmooth[k] >= gestureSmooth[k + 1] && gestureSmooth[k] >= gestureSmooth[k - 1])
+                            if (gestureSmooth[k] >= gestureSmooth[k + 1] &&
+                                gestureSmooth[k] >= gestureSmooth[k - 1])
                             {
                                 pp++;
                             }
-                            else if (gestureSmooth[k] <= gestureSmooth[k + 1] && gestureSmooth[k] <= gestureSmooth[k - 1])
+                            else if (gestureSmooth[k] <= gestureSmooth[k + 1] &&
+                                     gestureSmooth[k] <= gestureSmooth[k - 1])
                             {
                                 np++;
                             }
@@ -270,6 +291,7 @@ namespace Algorithm
 
         public State GestureKind(int pp, int np, List<float> gestT)
         {
+
             switch (pp)
             {
                 case 1 when np == 2:

@@ -78,7 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="music1.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
