@@ -132,7 +132,7 @@ namespace Algorithm
             Parallel.For(0, 2700, i => { subFrame1[i] = (short) (ch1Data[2][i] * 2 - ch1Data[0][i] - ch1Data[1][i]); });
 
             var subFrame2 = new short[2700];
-            Parallel.For(0, 2700, i => { subFrame1[i] = (short) (ch2Data[2][i] * 2 - ch2Data[0][i] - ch2Data[1][i]); });
+            Parallel.For(0, 2700, i => { subFrame2[i] = (short) (ch2Data[2][i] * 2 - ch2Data[0][i] - ch2Data[1][i]); });
 
             res1.Add(RangeDetector(subFrame1, dthres));
             res2.Add(RangeDetector(subFrame2, dthres));
@@ -264,7 +264,7 @@ namespace Algorithm
                         int pp = 0;
                         int np = 0;
 
-                        var gestT = new List<float>(theta.GetRange(1, i - 1));
+                        var gestT = new List<float>(theta.GetRange(lhp + 2, i - 1));
                         gestureOutput = gestureSmooth.GetRange(1, i - 1);
 
                         for (int k = 2; k < i - 2; k++)
