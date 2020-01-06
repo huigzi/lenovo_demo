@@ -25,10 +25,10 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <d3:Chart Name="GestureR" Grid.Column="0" >
+                    <d3:Chart Name="GestureR" Grid.Column="0" Visibility="Hidden">
                         <d3:LineGraph x:Name="Rline" Stroke="Blue" StrokeThickness="3"/>
                     </d3:Chart>
-                    <d3:Chart Name="GestureS" Grid.Column="1" >
+                    <d3:Chart Name="GestureS" Grid.Column="1" Visibility="Hidden">
                         <d3:LineGraph x:Name="Sline" Stroke="Red" StrokeThickness="3"/>
                     </d3:Chart>
                 </Grid>
@@ -68,8 +68,8 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="8*"/>
                     </Grid.ColumnDefinitions>
-                    <Label x:Name="RecvLamp" Grid.Column="3" Background="Green"/>
-                    <Button x:Name="SaveDataButton" Grid.Column="5" Content="数据保存" Click="SaveDataButton_Click"/>
+                    <!--<Label x:Name="RecvLamp" Grid.Column="3" Background="Green" Visibility="Hidden"/>-->
+                    <Button x:Name="SaveDataButton" Grid.Column="5" Content="数据保存" Click="SaveDataButton_Click" Visibility="Hidden"/>
                     <!--<Button x:Name="Button1" Grid.Column="1" Click="button1_Click"/>
                     <Button x:Name="Button2" Grid.Column="3" Click="button2_Click"/>
                     <Button x:Name="Button3" Grid.Column="5" Click="button3_Click"/>

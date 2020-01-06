@@ -25,7 +25,7 @@ namespace Core
             MusicList.Add("music2.wav");
             MusicList.Add("music3.wav");
 
-            wavePlay = new WaveOut { Volume = 0.2f };
+            wavePlay = new WaveOut { Volume = 0.5f };
             wavePlay.Init(new AudioFileReader(MusicList[0]));
 
             Volume = 0.2f;
@@ -47,13 +47,13 @@ namespace Core
         {
             if (wavePlay == null) return;
 
-            //wavePlay.Volume += 0.2f;
-            //Volume += 0.2f;
+            wavePlay.Volume += 0.2f;
+            Volume += 0.2f;
 
             if (Volume > 0.8f)
             {
-            //    wavePlay.Volume = 0.2f;
-            //    Volume = 0.2f;
+                wavePlay.Volume = 0.2f;
+                Volume = 0.2f;
             }
         }
 

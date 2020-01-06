@@ -22,7 +22,7 @@ namespace UI
         private readonly UsbServer usbServer;
         private readonly Logger logger;
         private readonly SaveData saveData;
-        private int lampFlag = 0;
+        //private int lampFlag = 0;
 
         public MainWindow()
         {
@@ -39,37 +39,36 @@ namespace UI
             var process = new Process(new GestureAndPresenceMethod(readXml), readXml);
             var statusMachine = new StatusMachine();
 
-            var transformBlock1 = new TransformBlock<byte[], byte[]>(x => saveData.WriteData(x));
+            //var transformBlock1 = new TransformBlock<byte[], byte[]>(x => saveData.WriteData(x));
 
             var transformBlock2 = new TransformBlock<byte[], ArrayList>(x => process.DataProcess(x));
             var actionBlock = new ActionBlock<ArrayList>(x =>
             {
-                lampFlag = 1 - lampFlag;
+                //lampFlag = 1 - lampFlag;
 
-                Dispatcher?.InvokeAsync(() =>
-                {
-                    RecvLamp.Background = lampFlag == 1
-                        ? new SolidColorBrush(Color.FromRgb(255, 255, 0))
-                        : new SolidColorBrush(Color.FromRgb(0, 255, 255));
+                //Dispatcher?.InvokeAsync(() =>
+                //{
+                //    //RecvLamp.Background = lampFlag == 1
+                //    //    ? new SolidColorBrush(Color.FromRgb(255, 255, 0))
+                //    //    : new SolidColorBrush(Color.FromRgb(0, 255, 255));
 
-                    if((State) x[0] == State.SomeOne)
-                    {
-                        Rline.PlotY(x[1] as IEnumerable);
-                        Sline.PlotY(x[2] as IEnumerable);
-                    }
+                //    //if((State) x[0] == State.SomeOne)
+                //    //{
+                //    //    Rline.PlotY(x[1] as IEnumerable);
+                //    //    Sline.PlotY(x[2] as IEnumerable);
+                //    //}
 
-                });
-
+                //});
 
                 if ((State) x[0] == statusMachine.LastState) return;
                 statusMachine.LastState = (State) x[0];
                 StateChangeUi(x);
             });
 
-            transformBlock1.LinkTo(transformBlock2);
+            //transformBlock1.LinkTo(transformBlock2);
             transformBlock2.LinkTo(actionBlock);
 
-            usbServer = new UsbServer(transformBlock1);
+            usbServer = new UsbServer(transformBlock2);
         }
 
         private void Window_Loaded(object sender, EventArgs e)
@@ -82,20 +81,17 @@ namespace UI
             CurrentM.Content = musicPlayer.MusicList[1];
             NextM.Content = musicPlayer.MusicList[2];
 
-            Task.Run(() =>
+            var res = usbServer.UsbFind();
+            {
+                if (res == -1)
                 {
-                    var res = usbServer.UsbFind();
-                    {
-                        if (res == -1)
-                        {
-                            MessageBox.Show("USB Device Not Find.");
-                            logger.WriteToLog("USB Device Not Find.");
-                            return;
-                        }
-                    }
-                    usbServer.Initialize();
+                    MessageBox.Show("USB Device Not Find. Please restart this software.");
+                    logger.WriteToLog("USB Device Not Find.");
+                    Environment.Exit(0);
+                    //return;
                 }
-            );
+            }
+            usbServer.Initialize();
         }
 
         private void Window_Closing(object sender, EventArgs e)
@@ -125,8 +121,8 @@ namespace UI
 
                     Dispatcher?.InvokeAsync(() =>
                     {
-                        Rline.PlotY(arrayList[1] as IEnumerable);
-                        Sline.PlotY(arrayList[2] as IEnumerable);
+                        //Rline.PlotY(arrayList[1] as IEnumerable);
+                        //Sline.PlotY(arrayList[2] as IEnumerable);
 
                         switch (musicPlayer.CurrentStatus)
                         {
@@ -160,8 +156,8 @@ namespace UI
 
                     Dispatcher?.InvokeAsync(() =>
                     {
-                        Rline.PlotY(arrayList[1] as IEnumerable);
-                        Sline.PlotY(arrayList[2] as IEnumerable);
+                        //Rline.PlotY(arrayList[1] as IEnumerable);
+                        //Sline.PlotY(arrayList[2] as IEnumerable);
 
                         musicPlayer.UpdateVolume();
                         Pb.Value = musicPlayer.Volume;
@@ -172,13 +168,13 @@ namespace UI
 
                     Dispatcher?.InvokeAsync(() =>
                     {
-                        musicPlayer.ListLeft();
+                        musicPlayer.ListRight();
 
                         LastM.Content = musicPlayer.MusicList[0];
                         CurrentM.Content = musicPlayer.MusicList[1];
                         NextM.Content = musicPlayer.MusicList[2];
-                        Rline.PlotY(arrayList[1] as IEnumerable);
-                        Sline.PlotY(arrayList[2] as IEnumerable);
+                        //Rline.PlotY(arrayList[1] as IEnumerable);
+                        //Sline.PlotY(arrayList[2] as IEnumerable);
 
                         switch (musicPlayer.CurrentStatus)
                         {
@@ -207,8 +203,8 @@ namespace UI
                         LastM.Content = musicPlayer.MusicList[0];
                         CurrentM.Content = musicPlayer.MusicList[1];
                         NextM.Content = musicPlayer.MusicList[2];
-                        Rline.PlotY(arrayList[1] as IEnumerable);
-                        Sline.PlotY(arrayList[2] as IEnumerable);
+                        //Rline.PlotY(arrayList[1] as IEnumerable);
+                        //Sline.PlotY(arrayList[2] as IEnumerable);
 
                         switch (musicPlayer.CurrentStatus)
                         {
@@ -229,11 +225,11 @@ namespace UI
 
                 case State.OtherGesture:
                     
-                    Dispatcher?.InvokeAsync(() =>
-                    {
-                        Rline.PlotY(arrayList[1] as IEnumerable);
-                        Sline.PlotY(arrayList[2] as IEnumerable);
-                    });
+                    //Dispatcher?.InvokeAsync(() =>
+                    //{
+                    //    Rline.PlotY(arrayList[1] as IEnumerable);
+                    //    Sline.PlotY(arrayList[2] as IEnumerable);
+                    //});
                     break;
 
                 default:
@@ -245,6 +241,8 @@ namespace UI
         {
             GestureR.Visibility = GestureR.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
             GestureS.Visibility = GestureS.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
+            SaveDataButton.Visibility =
+                SaveDataButton.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
         }
 
         private void SaveDataButton_Click(object sender, RoutedEventArgs e)

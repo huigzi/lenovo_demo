@@ -13,9 +13,9 @@ namespace Core
         private UsbRegDeviceList regList;
         private UsbEndpointReader reader;
         
-        private readonly TransformBlock<byte[], byte[]> transformBlock;
+        private readonly TransformBlock<byte[], ArrayList> transformBlock;
 
-        public UsbServer(TransformBlock<byte[], byte[]> transformBlock)
+        public UsbServer(TransformBlock<byte[], ArrayList> transformBlock)
         {
             myUsbFinder = new UsbDeviceFinder(0x0483, 0x572B);
             this.transformBlock = transformBlock;
