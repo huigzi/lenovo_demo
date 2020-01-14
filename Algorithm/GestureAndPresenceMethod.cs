@@ -264,7 +264,7 @@ namespace Algorithm
                         int pp = 0;
                         int np = 0;
 
-                        var gestT = new List<float>(theta.GetRange(1, i - 1));
+                        var gestT = new List<float>(theta.GetRange(lhp + 2, i - 1));
                         gestureOutput = gestureSmooth.GetRange(1, i - 1);
 
                         for (int k = 2; k < i - 2; k++)
