@@ -3,67 +3,122 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core;
+using LanguageExt;
 
 namespace Algorithm
 {
     public class GestureAndPresenceMethod
     {
-        private static float[] a1 = new float[3] { 1f, -1.8139f, 0.8239f };
-        private static float[] a2 = new float[3] { 1f, -1.9125f, 0.9231f };
-        private static float[] b1 = new float[3] { 0.0026f, 0.0051f, 0.0026f };
-        private static float[] b2 = new float[3] { 0.0026f, 0.0051f, 0.0026f };
+        private int pdn_thre1 = 10;
+        private int pdn_thre2 = 10;
+        private int migr_thre1 = 10;
+        private int migr_thre2 = 10;
+        private int np_count_thre = 3;
+        private int tr_thremi = 30;
+        private int init_len = 5;
+        private float eu = 0.095555555555556f;
+        private int track_len = 85;
+        private int gatel = 15;
+        private int gateu = 20;
+        private int tr_threm0 = 15;
+        private int thre2 = 15;
+        private int int1_dot = 314;
+        private int int2_dot = 1256;
+        private float alpha = 0.2f;
+        private int lost_thre = 15;
+        private int ref_lenl = 7;
+        private int fp = 6;
+        private int fronts = 10;
+        private int backs = 20;
+        private int gest_thre = 3;
+        private float ndiff_thre = -2f;
+        private int diff_win = 3;
+        private int dthre = 1;
+        private int dev_thres = 5;
+        private int dev_thref = 5;
+        private int non_thre = 8;
+        private int mf_ord = 5;
+        private float R = 14.5f;
+        private float dc_thre = 0.5f;
+        private int thre1;
 
-        private readonly float es;
-        private readonly int dthres;
-        private readonly int thres;
-        private readonly int det_thres;
-        private readonly int fb;
-        private readonly int ff;
-        private readonly int mv_thres;
-        private readonly int lhp;
-        private readonly int trough_thre;
-        private readonly int tail_thres;
-        private readonly int tail_len;
-        private readonly int tailn_thres;
-        private readonly int head_thres;
-        private readonly int head_len;
-        private readonly int headln_thres;
+        private int npCount = 0;
+        public int TrackCount { get; set; } = 0;
+        private int lostCount = 0;
+
+        private readonly float[] gest1Ref =
+        {
+            1.000000000000000f, 0.993844170297569f, 0.975528258147577f, 0.945503262094184f, 0.904508497187474f,
+            0.853553390593274f, 0.793892626146237f, 0.726995249869773f, 0.654508497187474f, 0.578217232520115f,
+            0.500000000000000f, 0.421782767479885f, 0.345491502812526f, 0.273004750130227f, 0.206107373853763f,
+            0.146446609406726f, 0.095491502812526f, 0.054496737905816f, 0.024471741852423f, 0.006155829702431f,
+            0.000000000000000f, 0.006155829702431f, 0.024471741852423f, 0.054496737905816f, 0.095491502812526f,
+            0.146446609406726f, 0.206107373853763f, 0.273004750130227f, 0.345491502812526f, 0.421782767479885f,
+            0.500000000000000f, 0.578217232520115f, 0.654508497187474f, 0.726995249869773f, 0.793892626146236f,
+            0.853553390593274f, 0.904508497187474f, 0.945503262094184f, 0.975528258147577f, 0.993844170297569f,
+            1.000000000000000f
+        };
+
+        private readonly float[] gest2Ref =
+        {
+            1.000000000000000f, 0.972370634160430f, 0.904846342427666f, 0.807736391220236f, 0.717091339858728f,
+            0.610645285344996f, 0.495086624765342f, 0.377676333759009f, 0.265791732714771f, 0.166462942599017f,
+            0.085931156600455f, 0.029256483008567f, 0.000000000000000f, 0.000000000000000f, 0.029256483008567f,
+            0.085931156600455f, 0.166462942599017f, 0.246994728597579f, 0.322767596235473f, 0.389321647494712f,
+            0.442776236494811f, 0.480073804745482f, 0.499171998791488f, 0.499171998791488f, 0.499171998791488f,
+            0.499171998791488f, 0.499171998791488f, 0.499171998791488f, 0.499171998791488f, 0.480073804745482f,
+            0.442776236494811f, 0.389321647494711f, 0.322767596235473f, 0.246994728597578f, 0.166462942599017f,
+            0.085931156600455f, 0.029256483008567f, 0.000000000000000f, 0.000000000000000f, 0.029256483008567f,
+            0.085931156600455f, 0.166462942599017f, 0.265791732714771f, 0.377676333759009f, 0.495086624765341f,
+            0.610645285344996f, 0.717091339858728f, 0.807736391220236f, 0.904846342427665f, 0.972370634160430f,
+            1.000000000000000f
+        };
 
         List<short[]> ch1;
         List<short[]> ch2;
+        List<float> trackingLine1;
+        List<float> trackingLine2;
+
+        public enum FindChannelNum
+        {
+            None = 0,
+            Channel1Start = 1,
+            Channel2Start = 2,
+            Channel1End = 3,
+            Channel2End = 4
+        }
+
+        public enum GestureLikely
+        {
+            Sweep = 0,
+            DoubleClick = 1,
+            Indistinguishable = 2,
+            None = 4
+        }
 
         public GestureAndPresenceMethod(IReadFile readConfigration)
         {
             const float fs = 180e3f;
             const int c = 340;
-            es = c / fs * 50;
 
             var list = readConfigration.ReadXmlFile();
 
-            dthres = list[0];
-            thres = list[1];
-            det_thres = list[2];
-            mv_thres = list[4];
-            fb = list[5];
-            ff = list[6];
-            lhp = list[7];
-            trough_thre = list[8];
-            tail_thres = list[9];
-            tail_len = list[10];
-            tailn_thres = list[11];
-            head_thres = list[12];
-            head_len = list[13];
-            headln_thres = list[14];
+            ch1 = new List<short[]> {new short[2700], new short[2700]};
+            ch2 = new List<short[]> {new short[2700], new short[2700]};
+            trackingLine1 = new List<float>();
 
-            ch1 = new List<short[]> {new short[2700], new short[2700], new short[2700]};
-            ch2 = new List<short[]> {new short[2700], new short[2700], new short[2700]};
+            for (int i = 0; i < track_len; i++)
+            {
+                trackingLine1.Add(0);
+                trackingLine2.Add(0);
+            }
+
+            thre1 = tr_thremi;
 
         }
 
-        public Tuple<List<short[]>, List<short[]>> PrePorcessData(byte[] bytes)
+        public (short[], short[]) Byte2Int16(byte[] bytes)
         {
-            ch1.RemoveAt(0);
-            ch2.RemoveAt(0);
 
             ch1.Add(new short[2700]);
             ch2.Add(new short[2700]);
@@ -72,259 +127,415 @@ namespace Algorithm
 
             for (int i = 0; i < bytes.Length; i = i + 4)
             {
-                ch1[2][k] = (short) (BitConverter.ToUInt16(bytes, i) - 2048);
-                ch2[2][k] = (short) (BitConverter.ToUInt16(bytes, i + 2) - 2048);
+                ch1[2][k] = (short) BitConverter.ToUInt16(bytes, i);
+                ch2[2][k] = (short) BitConverter.ToUInt16(bytes, i + 2);
                 k++;
             }
 
-            return new Tuple<List<short[]>, List<short[]>>(ch1, ch2);
-        }
-
-        private float RangeDetector(IList<short> temp, int thresArg)
-        {
-            float[,] wi = new float[2, 3] {{0f, 0f, 0f}, {0f, 0f, 0f}};
-            float[] env = new float[3] {0f, 0f, 0f};
-            short temp2 = 0;
-
-            for (int i = 156; i < 1047; i++)
-            {
-                //1st stage
-                env[0] = env[1];
-                env[1] = env[2];
-
-                wi[0, 2] = wi[0, 1];
-                wi[0, 1] = wi[0, 0];
-
-                if (temp[i] < 0)
-                {
-                    temp2 = (short)(-1 * temp[i]);
-                }
-                else
-                {
-                    temp2 = temp[i];
-                }
-
-                wi[0, 0] = temp2 - a1[1] * wi[0, 1] - a1[2] * wi[0, 2];
-                var y = b1[0] * wi[0, 0] + b1[1] * wi[0, 1] + b1[2] * wi[0, 2];
-
-                //2st stage
-                wi[1, 2] = wi[1, 1];
-                wi[1, 1] = wi[1, 0];
-                wi[1, 0] = y - a2[1] * wi[1, 1] - a2[2] * wi[1, 2];
-                env[2] = b2[0] * wi[1, 0] + b2[1] * wi[1, 1] + b2[2] * wi[1, 2];
-
-                if (env[1] <= thresArg) continue;
-                if (env[1] > env[2] && env[1] > env[0])
-                {
-                    return i * es;
-                }
-            }
-
-            return 0;
-        }
-
-        public void Detection(Tuple<List<short[]>, List<short[]>> tuple, List<float> res1, List<float> res2, List<float> r, List<float> theta)
-        {
-            var ch1Data = tuple.Item1;
-            var ch2Data = tuple.Item2;
-
             var subFrame1 = new short[2700];
-            Parallel.For(0, 2700, i => { subFrame1[i] = (short) (ch1Data[2][i] * 2 - ch1Data[0][i] - ch1Data[1][i]); });
+            Parallel.For(0, 2700, i => { subFrame1[i] = (short) (ch1[2][i] - ch1[0][i]); });
 
             var subFrame2 = new short[2700];
-            Parallel.For(0, 2700, i => { subFrame2[i] = (short) (ch2Data[2][i] * 2 - ch2Data[0][i] - ch2Data[1][i]); });
+            Parallel.For(0, 2700, i => { subFrame2[i] = (short) (ch2[2][i] - ch2[0][i]); });
 
-            res1.Add(RangeDetector(subFrame1, dthres));
-            res2.Add(RangeDetector(subFrame2, dthres));
-            var res3 = RangeDetector(ch1Data[2],thres);
-            var res4 = RangeDetector(ch2Data[2],thres);
+            ch1.RemoveAt(0);
+            ch2.RemoveAt(0);
 
-            if (res3 > 0 && res4 > 0)
-            {
-                r.Add((res3 + res4) / 2);
-                theta.Add(res3 - res4);
-            }
-            else
-            {
-                r.Add(-1);
-                theta.Add(-1);
-            }
+            return (subFrame1, subFrame2);
         }
 
-        public State PresenceToNone(List<float> res1, List<float> res2)
+        public State PresenceToNone(List<float> r1, List<float> r2)
         {
-            int detNumR1 = 0;
-            int detNumR2 = 0;
+            var tempResult1 = r1.FindMt();
+            var tempResult2 = r2.FindMt();
 
-            Parallel.For(0, res1.Count, i =>
+            if (tempResult1.Item1 < pdn_thre1 && tempResult2.Item1 < pdn_thre2)
             {
-                if (res1[i] > 0) detNumR1++;
-                if (res2[i] > 0) detNumR2++;
-
-            });
-
-            if (detNumR1 > det_thres || detNumR2 > det_thres)
-            {
-                return State.SomeOne;
+                npCount++;
+                if (npCount <= np_count_thre - 1) return State.SomeOne;
+                npCount = 0;
+                return State.NoOne;
             }
-
-            return State.NoOne;
-        }
-
-        public State NoneToPresence(List<float> res1, List<float> res2)
-        {
-            int detNumR1 = 0;
-            int detNumR2 = 0;
-            int flag = 0;
-
-            Parallel.For(0, res1.Count, i =>
-            {
-                if (res1[i] > 0) detNumR1++;
-                if (res2[i] > 0) detNumR2++;
-            });
-
-            if (detNumR1 > det_thres)
-            {
-                var temp1 = res1.OrderByDescending(x => x).ToList();
-                double diff1 = Math.Abs(temp1[1] - temp1[detNumR1 - 2]);
-
-                if (diff1 < mv_thres)
-                {
-                    flag++;
-                }
-            }
-
-            if (detNumR2 > det_thres)
-            {
-                var temp2 = res2.OrderByDescending(x => x).ToList();
-                double diff2 = Math.Abs(temp2[1] - temp2[detNumR2 - 2]);
-
-                if (diff2 < mv_thres)
-                {
-                    flag++;
-                }
-            }
-
-            return flag > 0 ? State.SomeOne : State.NoOne;
-        }
-
-        public List<float> Smooth(List<float> data, int times = 7)
-        {
-            var result = new List<float>
-                {data[0], data.GetRange(0, 3).Sum() / 3, data.GetRange(0, 5).Sum() / 5};
-
-            for (int i = 3; i < data.Count - 3; i++)
-            {
-                var sum = data.GetRange(i - 3, times).Sum();
-                result.Add(sum / times);
-            }
-
-            result.Add(data.GetRange(data.Count - 5, 5).Sum() / 5);
-            result.Add(data.GetRange(data.Count - 3, 3).Sum() / 3);
-            result.Add(data[data.Count - 1]);
-
-            return result;
-
-        }
-
-        public State NoneToGesture(List<float> r, List<float> theta, ref List<float> gestureOutput)
-        {
-
-            float hdiffJu = 0;
-
-            var mean = r.GetRange(0, lhp).Sum() / lhp;
-
-            if (r[lhp + 2] > mean - trough_thre)
-            {
-                return State.SomeOne;
-            }
-
-            var gestureSmooth = Smooth(r).GetRange(lhp + 2, fb + ff + 1);
-
-            for (int i = 0; i < head_len; i++)
-            {
-                hdiffJu += ((gestureSmooth[i] - gestureSmooth[i + 1]) > head_thres ? 1 : 0);
-            }
-
-            if (hdiffJu >= headln_thres)
-            {
-                for (int i = fb + ff + 1; i > tail_len; i--)
-                {
-                    var tail = new List<float>(gestureSmooth.GetRange(i - tail_len - 1, tail_len + 1));
-
-                    float tdiffJu = 0;
-
-                    for (int j = 0; j < tail_len; j++)
-                    {
-                        tdiffJu += ((tail[j + 1] - tail[j]) > tail_thres ? 1 : 0);
-                    }
-
-                    if (tdiffJu >= tailn_thres)
-                    {
-                        int pp = 0;
-                        int np = 0;
-
-                        var gestT = new List<float>(theta.GetRange(lhp + 2, i - 1));
-                        gestureOutput = gestureSmooth.GetRange(1, i - 1);
-
-                        for (int k = 2; k < i - 2; k++)
-                        {
-                            if (gestureSmooth[k] >= gestureSmooth[k + 1] &&
-                                gestureSmooth[k] >= gestureSmooth[k - 1])
-                            {
-                                pp++;
-                            }
-                            else if (gestureSmooth[k] <= gestureSmooth[k + 1] &&
-                                     gestureSmooth[k] <= gestureSmooth[k - 1])
-                            {
-                                np++;
-                            }
-                        }
-
-                        return GestureKind(pp, np, gestT);
-                    }
-                }
-            }
-
+            
+            npCount = 0;
             return State.SomeOne;
         }
 
-        public State GestureKind(int pp, int np, List<float> gestT)
+        public State NoneToPresence(List<float> r1, List<float> r2)
         {
+            var tempResult1 = r1.FindMt();
+            var tempResult2 = r2.FindMt();
 
-            switch (pp)
+            float sum1 = 0, sum2 = 0;
+
+            if (tempResult1.Item1 > pdn_thre1)
             {
-                case 1 when np == 2:
-                    return State.DoubleClick;
+                var temp = tempResult1.Item2.OrderByDescending(x => x).ToList();
 
-                case 0 when np == 1:
+                if (temp[1] - temp[temp.Count - 2] < migr_thre1)
                 {
-                    var maxGesture = gestT.Max();
-                    var minGesture = gestT.Min();
-
-                    var maxIdx = gestT.IndexOf(maxGesture);
-                    var minIdx = gestT.IndexOf(minGesture);
-
-                    if (maxGesture > 0 && minGesture < 0)
-                    {
-                        return maxIdx > minIdx ? State.LeftSweep : State.RightSweep;
-                    }
-
-                    break;
-                }
-
-                default:
-                {
-                    if (pp >= 2 && np >= 2)
-                    {
-                        return State.Circle;
-                    }
-
-                    break;
+                    sum1 = temp[1];
                 }
             }
 
-            return State.OtherGesture;
+            if (tempResult2.Item1 > pdn_thre2)
+            {
+                var temp = tempResult2.Item2.OrderByDescending(x => x).ToList();
+
+                if (temp[1] - temp[temp.Count - 2] < migr_thre2)
+                {
+                    sum2 = temp[1];
+                }
+            }
+
+            if (sum1 > 0 || sum2 > 0)
+            {
+                return State.SomeOne;
+            }
+            else
+            {
+                return State.NoOne;
+            }
+        }
+
+        public int FindTrackStartPoint(List<float> sbd1, List<float> sbd2, ref int k1, ref int k2)
+        {
+            var result1 = sbd2.CalculateR(thre1, eu, k1, k2);
+
+            if (result1 > 0)
+            {
+                TrackCount++;
+                trackingLine1.Add(result1);
+                trackingLine1.RemoveAt(0);
+
+                k1 = (int) ((result1 - gatel) / eu);
+                k2 = (int) ((result1 + gateu) / eu);
+
+                thre1 = tr_threm0;
+
+                var result2 = sbd1.CalculateR(thre2, eu, int1_dot, int2_dot);
+                trackingLine2.Add(result2);
+                trackingLine2.RemoveAt(0);
+
+                if (TrackCount == init_len)
+                {
+                    lostCount = 0;
+
+                }
+
+                return TrackCount;
+            }
+
+            TrackCount = 0;
+            thre1 = tr_thremi;
+            return 0;
+        }
+
+        public Option<(List<float>, List<float>)> TrackComplete(List<float> sbd1, List<float> sbd2, ref int k1, ref int k2)
+        {
+            var result1 = sbd2.CalculateR(thre1, eu, k1, k2);
+
+            if (result1 > 0)
+            {
+                TrackCount++;
+                trackingLine1.Add(result1);
+                trackingLine1.RemoveAt(0);
+
+                k1 = (int) ((result1 - gatel) / eu);
+                k2 = (int) ((result1 + gateu) / eu);
+
+                lostCount = 0;
+            }
+            else
+            {
+                lostCount++;
+
+                result1 = trackingLine1[trackingLine1.Count - 1] * (1 + alpha) -
+                          alpha * trackingLine1[trackingLine1.Count - 2];
+
+                TrackCount++;
+                trackingLine1.Add(result1);
+                trackingLine1.RemoveAt(0);
+
+                k1 = (int)((result1 - gatel) / eu);
+                k2 = (int)((result1 + gateu) / eu);
+
+                if (lostCount > lost_thre)
+                {
+                    TrackCount = 0;
+                    lostCount = 0;
+                    k1 = int1_dot;
+                    k2 = int2_dot;
+
+                    var result2 = sbd1.CalculateR(thre2, eu, int1_dot, int2_dot);
+                    trackingLine2.Add(result2);
+                    trackingLine2.RemoveAt(0);
+
+                    return Option<(List<float>, List<float>)>.None;
+                }
+            }
+
+            var result3 = sbd1.CalculateR(thre2, eu, int1_dot, int2_dot);
+            trackingLine2.Add(result3);
+            trackingLine2.RemoveAt(0);
+
+            return TrackCount > track_len ? Option<(List<float>, List<float>)>.Some((trackingLine1, trackingLine2)) : Option<(List<float>, List<float>)>.None;
+        }
+
+        public Option<(int, FindChannelNum, List<float>, List<float>)> FindGestureStartPoint((List<float>, List<float>) trackline)
+        {
+            if (trackline.Item2[0] == 0)
+            {
+                trackline.Item2[0] = trackline.Item2[1];
+            }
+
+            if (trackline.Item2[trackline.Item2.Count - 1] == 0)
+            {
+                trackline.Item2[trackline.Item2.Count - 1] = trackline.Item2[trackline.Item2.Count - 2];
+            }
+
+            for (int i = 1; i < trackline.Item2.Count - 1; i++)
+            {
+                if (trackline.Item2[i] == 0)
+                {
+                    trackline.Item2[i] = (trackline.Item2[i - 1] + trackline.Item2[i + 1]) / 2;
+                }
+            }
+
+            var track1Mf = trackline.Item1.MedianFilter(fp).GetRange(fp, track_len - 2 * fp);
+            var track2Mf = trackline.Item2.MedianFilter(fp).GetRange(fp, track_len - 2 * fp);
+
+            var rref1Temp = track1Mf.GetRange(0, ref_lenl).OrderByDescending(x => x).ToArray();
+
+            if (rref1Temp[1] - rref1Temp[rref1Temp.Length - 2] < dev_thres)
+            {
+                var rref1 = rref1Temp[ref_lenl / 2];
+
+                for (int i = ref_lenl; i < ref_lenl + fronts; i++)
+                {
+                    if (!(track1Mf[i] < rref1 - gest_thre)) continue;
+
+                    var temp1 = track1Mf.GetRange(i - 4, 6 + diff_win);
+
+                    var resultFlag = new List<int>();
+
+                    for (int j = 0; j < temp1.Count - 1; j++)
+                    {
+                        resultFlag.Add(temp1[j + 1] - temp1[j] < ndiff_thre ? 1 : 0);
+                    }
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        var sum = resultFlag.GetRange(j, diff_win).Sum();
+
+                        if (sum >= diff_win - dthre)
+                        {
+                            return Option<(int, FindChannelNum, List<float>, List<float>)>.Some((i + j - 4,
+                                FindChannelNum.Channel1Start, track1Mf, track2Mf));
+                        }
+
+                    }
+                }
+            }
+
+            var rref2Temp = track2Mf.GetRange(0, ref_lenl).OrderByDescending(x => x).ToArray();
+
+            if (rref2Temp[1] - rref2Temp[rref2Temp.Length - 2] < dev_thres)
+            {
+
+                var rref2 = rref2Temp[ref_lenl / 2];
+
+                for (int i = ref_lenl; i < ref_lenl + fronts; i++)
+                {
+                    if (!(track2Mf[i] < rref2 - gest_thre)) continue;
+
+                    var temp1 = track2Mf.GetRange(i - 4, 6 + diff_win);
+
+                    var resultFlag = new List<int>();
+
+                    for (int j = 0; j < temp1.Count - 1; j++)
+                    {
+                        resultFlag.Add(temp1[j + 1] - temp1[j] < ndiff_thre ? 1 : 0);
+                    }
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        var sum = resultFlag.GetRange(j, diff_win).Sum();
+
+                        if (sum >= diff_win - dthre)
+                        {
+                            return Option<(int, FindChannelNum, List<float>, List<float>)>.Some((i + j - 4,
+                                FindChannelNum.Channel2Start, track1Mf, track2Mf));
+                        }
+
+                    }
+                }
+            }
+
+            return Option<(int, FindChannelNum, List<float>, List<float>)>.None;
+        }
+
+        public Option<(FindChannelNum, List<float>, List<float>)> FindGestureStopPoint((int, FindChannelNum, List<float>, List<float>) data)
+        {
+            int bulgeDet = 0;
+
+            if (data.Item2 == FindChannelNum.Channel1Start && bulgeDet == 0)
+            {
+                var track1Mf = data.Item3.ToList();
+
+                for (int k = track1Mf.Count() - 1; k > 0; k--)
+                {
+                    var rref1Temp = track1Mf.GetRange(k - ref_lenl + 1, ref_lenl).OrderByDescending(x => x).ToArray();
+
+                    if (!(rref1Temp[1] - rref1Temp[rref1Temp.Length - 2] < dev_thref)) continue;
+
+                    var rref1 = rref1Temp[ref_lenl / 2];
+
+                    for (int i = k - ref_lenl; i > k - ref_lenl - backs; i--)
+                    {
+                        if (!(track1Mf[i] < rref1 - gest_thre)) continue;
+
+                        var temp1 = track1Mf.GetRange(i - diff_win + 2, diff_win + 1);
+
+                        var resultFlag = new List<int>();
+
+                        for (int j = 0; j < temp1.Count - 1; j++)
+                        {
+                            resultFlag.Add(temp1[j + 1] - temp1[j] < ndiff_thre ? 1 : 0);
+                        }
+
+                        var sum = resultFlag.Sum();
+
+                        if (sum < diff_win - dthre) continue;
+
+                        var result1 = data.Item3.GetRange(data.Item1, i + 5 - data.Item1 + 1);
+                        var result2 = data.Item4.GetRange(data.Item1, i + 5 - data.Item1 + 1);
+
+                        return Option<(FindChannelNum, List<float>, List<float>)>.Some((FindChannelNum.Channel1End, result1, result2));
+                    }
+
+                }
+
+            }
+
+            if (data.Item2 == FindChannelNum.Channel2Start && bulgeDet == 0)
+            {
+                var track2Mf = data.Item4.ToList();
+
+                for (int k = track2Mf.Count() - 1; k > 0; k--)
+                {
+                    var rref2Temp = track2Mf.GetRange(k - ref_lenl + 1, ref_lenl).OrderByDescending(x => x).ToArray();
+
+                    if (!(rref2Temp[1] - rref2Temp[rref2Temp.Length - 2] < dev_thref)) continue;
+
+                    var rref2 = rref2Temp[ref_lenl / 2];
+
+                    for (int i = k - ref_lenl; i > k - ref_lenl - backs; i--)
+                    {
+                        if (!(track2Mf[i] < rref2 - gest_thre)) continue;
+
+                        var temp1 = track2Mf.GetRange(i - diff_win + 2, diff_win + 1);
+
+                        var resultFlag = new List<int>();
+
+                        for (int j = 0; j < temp1.Count - 1; j++)
+                        {
+                            resultFlag.Add(temp1[j + 1] - temp1[j] < ndiff_thre ? 1 : 0);
+                        }
+
+
+                        var sum = resultFlag.Sum();
+
+                        if (sum < diff_win - dthre) continue;
+
+                        var result1 = data.Item3.GetRange(data.Item1, i + 5 - data.Item1 + 1);
+                        var result2 = data.Item4.GetRange(data.Item1, i + 5 - data.Item1 + 1);
+
+                        return Option<(FindChannelNum, List<float>, List<float>)>.Some((FindChannelNum.Channel2End, result1, result2));
+                    }
+                }
+            }
+
+            return Option<(FindChannelNum, List<float>, List<float>)>.None;
+        }
+
+        public State GestureKind((FindChannelNum, List<float>, List<float>) data)
+        {
+            var gesture = new List<float>();
+
+            switch (data.Item1)
+            {
+                case FindChannelNum.Channel1Start:
+                    gesture.AddRange(data.Item2);
+                    break;
+                case FindChannelNum.Channel2Start:
+                    gesture.AddRange(data.Item3);
+                    break;
+                default:
+                    return State.SomeOne;
+            }
+
+            var temp1 = gesture.Normalize();
+
+            var s1 = temp1.Dtw(gest1Ref);
+            var s2 = temp1.Dtw(gest2Ref);
+            
+            var temp2 = GestureLikely.None;
+
+            if (s1 >= non_thre && s2 >= non_thre)
+            {
+                return State.SomeOne;
+            }
+
+            if (s1 < s2)
+            {
+                temp2 = GestureLikely.Sweep;
+            }
+            else if (s1 > s2)
+            {
+                temp2 = GestureLikely.DoubleClick;
+            }
+            else
+            {
+                temp2 = GestureLikely.Indistinguishable;
+            }
+
+            var track1F = data.Item2.MedianFilter(mf_ord);
+            var track2F = data.Item3.MedianFilter(mf_ord);
+
+            var x = track1F.Select((t, i) => track2F[i] * (t - track2F[i]) / R).ToList();
+
+            if (temp2 == GestureLikely.DoubleClick)
+            {
+                var nbz = x.Count(item => item > 0);
+
+                if (nbz > dc_thre * track1F.Count)
+                {
+                    return State.DoubleClickRight;
+                }
+                else if (nbz < (1 - dc_thre) * track1F.Count)
+                {
+                    return State.DoubleClickLeft;
+                }
+                else
+                {
+                    return State.DoubleClickMiddle;
+                }
+            }
+            else if (temp2 == GestureLikely.Sweep)
+            {
+                var leftPart = x.Take(x.Count / 2).OrderBy(item=>item).ToArray();
+                var rightPart = x.Skip(x.Count / 2).OrderBy(item=>item).ToArray();
+
+                var ml = leftPart[leftPart.Length / 2];
+                var mr = rightPart[rightPart.Length / 2];
+
+                return ml > mr ? State.LeftSweep : State.RightSweep;
+
+            }
+
+            return State.SomeOne;
+
         }
 
     }

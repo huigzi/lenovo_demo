@@ -9,12 +9,14 @@ namespace Core
     public enum State
     {
         NoOne = 0,
-        DoubleClick = 1,
+        DoubleClickLeft = 1,
         LeftSweep = 2,
         RightSweep = 3,
         Circle = 4,
         SomeOne = 5,
-        OtherGesture = 6
+        OtherGesture = 6,
+        DoubleClickRight = 7,
+        DoubleClickMiddle = 8
     }
 
     public enum PlayerState

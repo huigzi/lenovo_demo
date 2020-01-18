@@ -46,7 +46,7 @@ namespace AlgorithmTests
                     bytes[4 * j + 2] = (byte)(ch2[j, i] % 256);
                     bytes[4 * j + 3] = (byte)(ch2[j, i] / 256);
                 }
-                chData = testGestureAndPresenceMethod.PrePorcessData(bytes);
+                chData = testGestureAndPresenceMethod.Byte2Int16(bytes);
             }
 
             var res1 = new List<float>();

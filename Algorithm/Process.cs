@@ -8,25 +8,24 @@ namespace Algorithm
 {
     public class Process
     {
-        private int startFrameCountNum = 0;
-        private int presenceFrameCountNum = 0;
-        private int gestureFrameCountNum = 0;
-        private int detMiss = 0;
+        private int k1;
+        private int k2;
 
-        private readonly int det_miss_thre;
-        private readonly int fb;
-        private readonly int ff;
-        private readonly int lhp;
+        private readonly int flt_edge = 30;
+        private readonly int pd_thre1 = 10;
+        private readonly int pd_thre2 = 10;
+        private readonly float eu = 0.095555555555556f;
+        private readonly int int1_dot = 314;
+        private readonly int int2_dot = 1256;
 
         private readonly ArrayList result;
 
         private State currentState = State.SomeOne;
 
-        private readonly List<float> res1;
-        private readonly List<float> res2;
-        private readonly List<float> r;
-        private readonly List<float> theta;
-        private  List<float> gestureSmooth;
+        private readonly List<float> pdR1;
+        private readonly List<float> pdR2;
+
+        private int recvCount = 0;
 
         private readonly GestureAndPresenceMethod gestureAndPresenceMethod;
 
@@ -36,125 +35,63 @@ namespace Algorithm
             result = new ArrayList(3) {0, null, null};
 
             var list = readConfigration.ReadXmlFile();
-            det_miss_thre = list[3];
-            fb = list[5];
-            ff = list[6];
-            lhp = list[7];
 
-            res1 = new List<float>();
-            res2 = new List<float>();
-            r = new List<float>();
-            theta = new List<float>();
-            gestureSmooth = new List<float>();
+            pdR1 = new List<float>();
+            pdR2 = new List<float>();
+
+            k1 = int1_dot;
+            k2 = int2_dot;
+
+            for (int i = 0; i < 40; i++)
+            {
+                pdR1.Add(0f);
+                pdR2.Add(0f);
+            }
         }
 
         public ArrayList DataProcess(byte[] bytes)
         {
-            if (currentState != State.NoOne && currentState != State.SomeOne)
+            var tmpTuple = gestureAndPresenceMethod.Byte2Int16(bytes);
+
+            var s1Bd = tmpTuple.Item1.BandPassFilter().LowPassFilter().Skip(flt_edge).ToList();
+            var s2Bd = tmpTuple.Item2.BandPassFilter().LowPassFilter().Skip(flt_edge).ToList();
+
+            var r1 = s1Bd.CalculateR(pd_thre1, eu, int1_dot, int2_dot);
+            var r2 = s2Bd.CalculateR(pd_thre2, eu, int1_dot, int2_dot);
+
+            pdR1.Add(r1);
+            pdR2.Add(r2);
+            pdR1.RemoveAt(0);
+            pdR2.RemoveAt(0);
+
+            recvCount++;
+
+            if (recvCount > 19)
             {
-                currentState = State.SomeOne;
+                recvCount = 0;
+                currentState = currentState == State.NoOne ? gestureAndPresenceMethod.NoneToPresence(pdR1, pdR2) : gestureAndPresenceMethod.PresenceToNone(pdR1, pdR2);
             }
-
-            var tmpTuple = gestureAndPresenceMethod.PrePorcessData(bytes);
-
-            if (startFrameCountNum >= 2)
-            {
-                gestureAndPresenceMethod.Detection(tmpTuple, res1, res2, r, theta); //res1 re2 r theta每帧add
-            }
-            else
-            {
-                startFrameCountNum++;
-                result[0] = currentState;
-                return result;
-            }
-
-            presenceFrameCountNum++;
-
-            if (presenceFrameCountNum >= 20)
-            {
-                if (currentState == State.NoOne)
-                {
-                    currentState = gestureAndPresenceMethod.NoneToPresence(res1, res2);
-                }
-                else
-                {
-                    if (gestureAndPresenceMethod.PresenceToNone(res1, res2) == State.NoOne)
-                    {
-                        detMiss++;
-                    }
-                    else
-                    {
-                        detMiss = 0;
-                    }
-
-                    if (detMiss > det_miss_thre)
-                    {
-                        currentState = State.NoOne;
-                        detMiss = 0;
-
-                        r.Clear();
-                        theta.Clear();
-
-                        gestureFrameCountNum = 0;
-                    }
-                }
-
-                res1.RemoveRange(0, 10);
-                res2.RemoveRange(0, 10);
-                presenceFrameCountNum = 10;
-            }
-
 
             if (currentState == State.SomeOne)
             {
-                if (r.Last() > 0)
+                if (gestureAndPresenceMethod.TrackCount < 5)
                 {
-                    if (gestureFrameCountNum < fb + ff + 1 + lhp + 3)
-                    {
-                        gestureFrameCountNum++;
-                    }
-                    else
-                    {
-                        r.RemoveAt(0);
-                        theta.RemoveAt(0);
-                    }
+                    gestureAndPresenceMethod.FindTrackStartPoint(s1Bd, s2Bd, ref k1, ref k2);
                 }
                 else
                 {
-                    r.RemoveAt(r.Count - 1);
-                    theta.RemoveAt(theta.Count - 1);
-
-                }
-
-                if (gestureFrameCountNum >= fb + ff + 1 + lhp + 3)
-                {
-                    result[1] = new ArrayList(r);
-
-                    currentState = gestureAndPresenceMethod.NoneToGesture(r, theta, ref gestureSmooth);
-
-                    if (currentState != State.NoOne && currentState != State.SomeOne)
-                    {
-                        r.Clear();
-                        theta.Clear();
-                        gestureFrameCountNum = 0;
-                    }
-
-                    result[2] = new ArrayList(gestureSmooth);
-                }
-            }
-            else if (currentState == State.NoOne)
-            {
-                if (r.Count > 0)
-                {
-                    r.RemoveAt(r.Count - 1);
-                    theta.RemoveAt(theta.Count - 1);
-
+                    var result = gestureAndPresenceMethod.TrackComplete(s1Bd, s2Bd, ref k1, ref k2)
+                        .Bind(gestureAndPresenceMethod.FindGestureStartPoint)
+                        .Bind(gestureAndPresenceMethod.FindGestureStopPoint)
+                        .Match(
+                            x => gestureAndPresenceMethod.GestureKind(x),
+                            () => State.SomeOne
+                        );
+                    //todo 增加手势间隔判断
                 }
             }
 
-            result[0] = currentState;
-
-            return result;
+            return null;
         }
     }
 }
