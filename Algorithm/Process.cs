@@ -34,7 +34,7 @@ namespace Algorithm
             this.gestureAndPresenceMethod = gestureAndPresenceMethod;
             result = new ArrayList(3) {0, null, null};
 
-            var list = readConfigration.ReadXmlFile();
+            var list = readConfigration.ReadJsonFile();
 
             pdR1 = new List<float>();
             pdR2 = new List<float>();
@@ -81,6 +81,7 @@ namespace Algorithm
                 else
                 {
                     var result = gestureAndPresenceMethod.TrackComplete(s1Bd, s2Bd, ref k1, ref k2)
+
                         .Bind(gestureAndPresenceMethod.FindGestureStartPoint)
                         .Bind(gestureAndPresenceMethod.FindGestureStopPoint)
                         .Match(

@@ -69,6 +69,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="s1bd.mat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="s2bd.mat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="signal.mat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -77,6 +83,10 @@
     <ProjectReference Include="..\Algorithm\Algorithm.csproj">
       <Project>{83B04FA9-48DA-4FFD-B6A5-53DB7769FC77}</Project>
       <Name>Algorithm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{CBA8D534-D5FA-4991-A73D-18714AF32A19}</Project>
+      <Name>Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

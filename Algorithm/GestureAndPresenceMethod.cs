@@ -9,37 +9,37 @@ namespace Algorithm
 {
     public class GestureAndPresenceMethod
     {
-        private int pdn_thre1 = 10;
-        private int pdn_thre2 = 10;
-        private int migr_thre1 = 10;
-        private int migr_thre2 = 10;
-        private int np_count_thre = 3;
-        private int tr_thremi = 30;
-        private int init_len = 5;
-        private float eu = 0.095555555555556f;
-        private int track_len = 85;
-        private int gatel = 15;
-        private int gateu = 20;
-        private int tr_threm0 = 15;
-        private int thre2 = 15;
-        private int int1_dot = 314;
-        private int int2_dot = 1256;
-        private float alpha = 0.2f;
-        private int lost_thre = 15;
-        private int ref_lenl = 7;
-        private int fp = 6;
-        private int fronts = 10;
-        private int backs = 20;
-        private int gest_thre = 3;
-        private float ndiff_thre = -2f;
-        private int diff_win = 3;
-        private int dthre = 1;
-        private int dev_thres = 5;
-        private int dev_thref = 5;
-        private int non_thre = 8;
-        private int mf_ord = 5;
-        private float R = 14.5f;
-        private float dc_thre = 0.5f;
+        private readonly int pdn_thre1;
+        private readonly int pdn_thre2;
+        private readonly int migr_thre1;
+        private readonly int migr_thre2;
+        private readonly int np_count_thre;
+        private readonly int tr_thremi;
+        private readonly int init_len;
+        private readonly float eu;
+        private readonly int track_len ;
+        private readonly int gatel;
+        private readonly int gateu;
+        private readonly int tr_threm0;
+        private readonly int thre2;
+        private readonly int int1_dot;
+        private readonly int int2_dot;
+        private readonly float alpha;
+        private readonly int lost_thre;
+        private readonly int ref_lenl;
+        private readonly int fp;
+        private readonly int fronts;
+        private readonly int backs;
+        private readonly int gest_thre;
+        private readonly float ndiff_thre;
+        private readonly int diff_win;
+        private readonly int dthre;
+        private readonly int dev_thres;
+        private readonly int dev_thref;
+        private readonly int non_thre;
+        private readonly int mf_ord;
+        private readonly float R;
+        private readonly float dc_thre;
         private int thre1;
 
         private int npCount = 0;
@@ -98,14 +98,45 @@ namespace Algorithm
 
         public GestureAndPresenceMethod(IReadFile readConfigration)
         {
-            const float fs = 180e3f;
-            const int c = 340;
 
-            var list = readConfigration.ReadXmlFile();
+            var configurationData = readConfigration.ReadJsonFile();
 
-            ch1 = new List<short[]> {new short[2700], new short[2700]};
-            ch2 = new List<short[]> {new short[2700], new short[2700]};
+            pdn_thre1 = configurationData.ConfigurationGroupInt["pdn_thre1"];
+            pdn_thre2 = configurationData.ConfigurationGroupInt["pdn_thre2"]; 
+            migr_thre1 = configurationData.ConfigurationGroupInt["migr_thre1"];
+            migr_thre2 = configurationData.ConfigurationGroupInt["migr_thre2"];
+            np_count_thre = configurationData.ConfigurationGroupInt["np_count_thre"];
+            tr_thremi = configurationData.ConfigurationGroupInt["tr_thremi"]; 
+            init_len = configurationData.ConfigurationGroupInt["init_len"]; 
+            eu = configurationData.ConfigurationGroupFloat["eu"];
+            track_len = configurationData.ConfigurationGroupInt["track_len"]; 
+            gatel = configurationData.ConfigurationGroupInt["gatel"];
+            gateu = configurationData.ConfigurationGroupInt["gateu"];
+            tr_threm0 = configurationData.ConfigurationGroupInt["tr_threm0"]; 
+            thre2 = configurationData.ConfigurationGroupInt["thre2"]; 
+            int1_dot = configurationData.ConfigurationGroupInt["int1_dot"];
+            int2_dot = configurationData.ConfigurationGroupInt["int2_dot"];
+            alpha = configurationData.ConfigurationGroupFloat["alpha"];
+            lost_thre = configurationData.ConfigurationGroupInt["lost_thre"];
+            ref_lenl = configurationData.ConfigurationGroupInt["ref_lenl"];
+            fp = configurationData.ConfigurationGroupInt["fp"];
+            fronts = configurationData.ConfigurationGroupInt["fronts"];
+            backs = configurationData.ConfigurationGroupInt["backs"];
+            gest_thre = configurationData.ConfigurationGroupInt["gest_thre"];
+            ndiff_thre = configurationData.ConfigurationGroupFloat["ndiff_thre"];
+            diff_win = configurationData.ConfigurationGroupInt["diff_win"];
+            dthre = configurationData.ConfigurationGroupInt["dthre"];
+            dev_thres = configurationData.ConfigurationGroupInt["dev_thres"];
+            dev_thref = configurationData.ConfigurationGroupInt["dev_thref"];
+            non_thre = configurationData.ConfigurationGroupInt["non_thre"];
+            mf_ord = configurationData.ConfigurationGroupInt["mf_ord"];
+            R = configurationData.ConfigurationGroupFloat["R"];
+            dc_thre = configurationData.ConfigurationGroupFloat["dc_thre"];
+
+            ch1 = new List<short[]> {new short[1400], new short[1400]};
+            ch2 = new List<short[]> {new short[1400], new short[1400]};
             trackingLine1 = new List<float>();
+            trackingLine2 = new List<float>();
 
             for (int i = 0; i < track_len; i++)
             {
@@ -120,8 +151,8 @@ namespace Algorithm
         public (short[], short[]) Byte2Int16(byte[] bytes)
         {
 
-            ch1.Add(new short[2700]);
-            ch2.Add(new short[2700]);
+            ch1.Add(new short[1400]);
+            ch2.Add(new short[1400]);
 
             int k = 0;
 
@@ -132,11 +163,11 @@ namespace Algorithm
                 k++;
             }
 
-            var subFrame1 = new short[2700];
-            Parallel.For(0, 2700, i => { subFrame1[i] = (short) (ch1[2][i] - ch1[0][i]); });
+            var subFrame1 = new short[1400];
+            Parallel.For(0, subFrame1.Length, i => { subFrame1[i] = (short) (ch1[2][i] - ch1[0][i]); });
 
-            var subFrame2 = new short[2700];
-            Parallel.For(0, 2700, i => { subFrame2[i] = (short) (ch2[2][i] - ch2[0][i]); });
+            var subFrame2 = new short[1400];
+            Parallel.For(0, subFrame2.Length, i => { subFrame2[i] = (short) (ch2[2][i] - ch2[0][i]); });
 
             ch1.RemoveAt(0);
             ch2.RemoveAt(0);
@@ -208,8 +239,8 @@ namespace Algorithm
                 trackingLine1.Add(result1);
                 trackingLine1.RemoveAt(0);
 
-                k1 = (int) ((result1 - gatel) / eu);
-                k2 = (int) ((result1 + gateu) / eu);
+                k1 = (int) Math.Ceiling((result1 - gatel) / eu);
+                k2 = (int) Math.Ceiling((result1 + gateu) / eu);
 
                 thre1 = tr_threm0;
 
@@ -241,8 +272,8 @@ namespace Algorithm
                 trackingLine1.Add(result1);
                 trackingLine1.RemoveAt(0);
 
-                k1 = (int) ((result1 - gatel) / eu);
-                k2 = (int) ((result1 + gateu) / eu);
+                k1 = (int) Math.Ceiling((result1 - gatel) / eu);
+                k2 = (int) Math.Ceiling((result1 + gateu) / eu);
 
                 lostCount = 0;
             }
@@ -257,8 +288,8 @@ namespace Algorithm
                 trackingLine1.Add(result1);
                 trackingLine1.RemoveAt(0);
 
-                k1 = (int)((result1 - gatel) / eu);
-                k2 = (int)((result1 + gateu) / eu);
+                k1 = (int) Math.Ceiling((result1 - gatel) / eu);
+                k2 = (int) Math.Ceiling((result1 + gateu) / eu);
 
                 if (lostCount > lost_thre)
                 {

@@ -1,0 +1,37 @@
+{
+  "ConfigurationGroupInt": {
+    "pdn_thre1": 10,
+    "pdn_thre2": 10,
+    "migr_thre1": 10,
+    "migr_thre2": 10,
+    "np_count_thre": 3,
+    "tr_thremi": 30,
+    "init_len": 5,
+    "track_len": 85,
+    "gatel": 15,
+    "gateu": 20,
+    "tr_threm0": 15,
+    "thre2": 15,
+    "int1_dot": 314,
+    "int2_dot": 1256,
+    "lost_thre": 15,
+    "ref_lenl": 7,
+    "fp": 6,
+    "fronts": 10,
+    "backs": 20,
+    "gest_thre": 3,
+    "diff_win": 3,
+    "dthre": 1,
+    "dev_thres": 5,
+    "dev_thref": 5,
+    "non_thre": 8,
+    "mf_ord": 5
+  },
+  "ConfigurationGroupFloat": {
+    "eu": 0.095555555555556,
+    "alpha": 0.2,
+    "ndiff_thre": -2,
+    "R": 14.5,
+    "dc_thre": 0.5
+  }
+}

@@ -9,17 +9,17 @@ namespace Algorithm
 {
     public static class BasicMethod
     {
-        private static readonly float[] aBp1 = {1f, -0.090292374147464f, 0.777012688479490f};
-        private static readonly float[] aBp2 = {1f, -0.529211627791274f, 0.785710792359040f};
+        private static readonly float[] ABp1 = {1f, -0.090292374147464f, 0.777012688479490f};
+        private static readonly float[] ABp2 = {1f, -0.529211627791274f, 0.785710792359040f};
 
-        private static readonly float[] bBp1 = {0.155824798862912f, -0.311649597725824f, 0.155824798862912f};
-        private static readonly float[] bBp2 = {0.155824798862912f, 0.311649597725824f, 0.155824798862912f};
+        private static readonly float[] BBp1 = {0.155824798862912f, -0.311649597725824f, 0.155824798862912f};
+        private static readonly float[] BBp2 = {0.155824798862912f, 0.311649597725824f, 0.155824798862912f};
 
-        private static readonly float[] aLp1 = {1f, -1.874333706443614f, 0.878910638325473f};
-        private static readonly float[] aLp2 = {1f, -1.943253631193138f, 0.947998858506101f};
+        private static readonly float[] ALp1 = {1f, -1.874333706443614f, 0.878910638325473f};
+        private static readonly float[] ALp2 = {1f, -1.943253631193138f, 0.947998858506101f};
 
-        private static readonly float[] bLp1 = {0.001165079991193f, 0.002330160021464f, 0.001165079974324f};
-        private static readonly float[] bLp2 = {0.001165079991193f, 0.002330159943306f, 0.001165080008061f};
+        private static readonly float[] BLp1 = {0.001165079991193f, 0.002330160021464f, 0.001165079974324f};
+        private static readonly float[] BLp2 = {0.001165079991193f, 0.002330159943306f, 0.001165080008061f};
 
         public static List<float> BandPassFilter(this short[] data)
         {
@@ -31,16 +31,16 @@ namespace Algorithm
                 //1st stage
                 wi[0, 2] = wi[0, 1];
                 wi[0, 1] = wi[0, 0];
-                wi[0, 0] = item - aBp1[1] * wi[0, 1] - aBp1[2] * wi[0, 2];
+                wi[0, 0] = item - ABp1[1] * wi[0, 1] - ABp1[2] * wi[0, 2];
 
-                var y = bBp1[0] * wi[0, 0] + bBp1[1] * wi[0, 1] + bBp1[2] * wi[0, 2];
+                var y = BBp1[0] * wi[0, 0] + BBp1[1] * wi[0, 1] + BBp1[2] * wi[0, 2];
 
                 //2st stage
                 wi[1, 2] = wi[1, 1];
                 wi[1, 1] = wi[1, 0];
-                wi[1, 0] = y - aBp2[1] * wi[1, 1] - aBp2[2] * wi[1, 2];
+                wi[1, 0] = y - ABp2[1] * wi[1, 1] - ABp2[2] * wi[1, 2];
 
-                result.Add(Math.Abs(bBp2[0] * wi[1, 0] + bBp2[1] * wi[1, 1] + bBp2[2] * wi[1, 2]));
+                result.Add(Math.Abs(BBp2[0] * wi[1, 0] + BBp2[1] * wi[1, 1] + BBp2[2] * wi[1, 2]));
             }
 
             return result;
@@ -56,16 +56,16 @@ namespace Algorithm
                 //1st stage
                 wi[0, 2] = wi[0, 1];
                 wi[0, 1] = wi[0, 0];
-                wi[0, 0] = item - aLp1[1] * wi[0, 1] - aLp1[2] * wi[0, 2];
+                wi[0, 0] = item - ALp1[1] * wi[0, 1] - ALp1[2] * wi[0, 2];
 
-                var y = bLp1[0] * wi[0, 0] + bLp1[1] * wi[0, 1] + bLp1[2] * wi[0, 2];
+                var y = BLp1[0] * wi[0, 0] + BLp1[1] * wi[0, 1] + BLp1[2] * wi[0, 2];
 
                 //2st stage
                 wi[1, 2] = wi[1, 1];
                 wi[1, 1] = wi[1, 0];
-                wi[1, 0] = y - aLp2[1] * wi[1, 1] - aLp2[2] * wi[1, 2];
+                wi[1, 0] = y - ALp2[1] * wi[1, 1] - ALp2[2] * wi[1, 2];
 
-                result.Add(Math.Abs(bLp2[0] * wi[1, 0] + bLp2[1] * wi[1, 1] + bLp2[2] * wi[1, 2]));
+                result.Add(Math.Abs(BLp2[0] * wi[1, 0] + BLp2[1] * wi[1, 1] + BLp2[2] * wi[1, 2]));
             }
 
             return result;
@@ -80,7 +80,7 @@ namespace Algorithm
                 if (!(data[i] >= data[i + 1])) continue;
                 if (data[i] >= pdThread)
                 {
-                    return i * eu;
+                    return (i + 1) * eu;
                 }
             }
 
@@ -134,7 +134,7 @@ namespace Algorithm
         {
             var max = data.Max();
             var min = data.Min();
-            var mean = data.Sum() / data.Count();
+            var mean = data.Average();
 
             var temp = data.Select(x => x - mean).Select(x => x / (max - min)).Select(x => x - min).ToList();
 

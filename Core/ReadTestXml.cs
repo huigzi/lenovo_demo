@@ -7,13 +7,8 @@ using System.Xml;
 
 namespace Core
 {
-    public class ReadTestXml: IReadFile
+    public class ReadTestXml
     {
-
-        public List<int> ReadJsonFile()
-        {
-            return new List<int>();
-        }
 
         public List<int> ReadXmlFile()
         {

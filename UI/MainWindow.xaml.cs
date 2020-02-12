@@ -35,8 +35,8 @@ namespace UI
 
             saveData = new SaveData();
 
-            var readXml = new ReadXml();
-            var process = new Process(new GestureAndPresenceMethod(readXml), readXml);
+            var readJson = new ReadConfiguration();
+            var process = new Process(new GestureAndPresenceMethod(readJson), readJson);
             var statusMachine = new StatusMachine();
 
             //var transformBlock1 = new TransformBlock<byte[], byte[]>(x => saveData.WriteData(x));
@@ -117,7 +117,7 @@ namespace UI
                     });
                     break;
 
-                case State.DoubleClick:
+                case State.DoubleClickMiddle:
 
                     Dispatcher?.InvokeAsync(() =>
                     {
