@@ -1,29 +1,48 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Algorithm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MathNet.Numerics.Data.Matlab;
+using Algorithm;
 using Core;
+using MathNet.Numerics.Data.Matlab;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Algorithm.Tests
+namespace UnitMethodTests
 {
     [TestClass()]
-    public class BasicMethodTests
+    public class UnitMethodTests
     {
+        private GestureAndPresenceMethod method = new GestureAndPresenceMethod(new ReadConfiguration());
+
+        private readonly short[] signalData = MatlabReader.ReadAll<double>("signal.mat")["signal"].ToRowMajorArray()
+            .Select(x => (Int16) (x)).ToArray();
+
+        private readonly List<float> s1Bd = MatlabReader.ReadAll<double>("s1bd.mat")["s1bd"].ToRowMajorArray().Select(x => (float)x)
+            .ToList();
+
+        private readonly List<float> s2Bd = MatlabReader.ReadAll<double>("s2bd.mat")["s2bd"].ToRowMajorArray().Select(x => (float)x)
+            .ToList();
+
+        private readonly List<float> trackline1 = MatlabReader.ReadAll<double>("track1.mat")["track1_win"].ToColumnMajorArray()
+            .Select(x => (float)x).ToList();
+
+        private readonly List<float> trackline2 = MatlabReader.ReadAll<double>("track2.mat")["track2_win"].ToColumnMajorArray()
+            .Select(x => (float)x).ToList();
+
+        private readonly List<float> tracklineGesture1 = MatlabReader.ReadAll<double>("track1_gesture.mat")["track1_win"].ToColumnMajorArray()
+            .Select(x => (float)x).ToList();
+
+        private readonly List<float> tracklineGesture2 = MatlabReader.ReadAll<double>("track2_gesture.mat")["track2_win"].ToColumnMajorArray()
+            .Select(x => (float)x).ToList();
+
         [TestMethod()]
-        public void BandPassFilterTest()
+        public void FilterTest()
         {
-            var signalData = MatlabReader.ReadAll<double>("signal.mat")["signal"].ToRowMajorArray()
-                .Select(x => (Int16) (x)).ToArray();
-
             var result1 = signalData.BandPassFilter().LowPassFilter();
+        }
 
-            var method = new GestureAndPresenceMethod(new ReadConfiguration());
-
-            //Test NoneToPresence PresenceToNone
+        [TestMethod()]
+        public void NoneToPresenceTest()
+        {
             var r1 = new List<float>
             {
                 71.4755555555555f, 43.8600000000000f, 40.3244444444444f, 46.8222222222222f, 38.8911111111111f,
@@ -50,24 +69,13 @@ namespace Algorithm.Tests
 
             var state = method.PresenceToNone(r1, r2);
 
-            if (state != State.SomeOne)
-            {
-                Assert.Fail("Function PresenceToNone test failed");
-            }
+            Assert.AreEqual(State.SomeOne, state);
+        }
 
-            r1 = new List<float>
-            {
-                87.2422222222222f, 0, 89.9177777777778f, 87.3377777777778f, 87.7200000000000f,
-                87.9111111111111f, 0, 88.8666666666667f, 86.0955555555556f, 88.9622222222222f,
-                85.5222222222222f, 0, 0, 0, 90.3000000000000f,
-                88.1977777777778f, 89.1533333333333f, 90.0133333333333f, 85.2355555555556f, 88.7711111111111f,
-                88.9622222222222f, 94.1222222222222f, 89.4400000000000f, 88.4844444444444f, 0,
-                0, 0, 0, 0, 85.1400000000000f,
-                0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0
-            };
-
-            r2 = new List<float>
+        [TestMethod()]
+        public void PresenceToNoneTest()
+        {
+            var r1 = new List<float>
             {
                 87.2422222222222f, 0, 89.9177777777778f, 87.3377777777778f, 87.7200000000000f,
                 87.9111111111111f, 0, 88.8666666666667f, 86.0955555555556f, 88.9622222222222f,
@@ -79,31 +87,55 @@ namespace Algorithm.Tests
                 0, 0, 0, 0, 0
             };
 
-            state = method.NoneToPresence(r1, r2);
-
-            if (state != State.SomeOne)
+            var r2 = new List<float>
             {
-                Assert.Fail("Function PresenceToNone test failed");
-            }
+                87.2422222222222f, 0, 89.9177777777778f, 87.3377777777778f, 87.7200000000000f,
+                87.9111111111111f, 0, 88.8666666666667f, 86.0955555555556f, 88.9622222222222f,
+                85.5222222222222f, 0, 0, 0, 90.3000000000000f,
+                88.1977777777778f, 89.1533333333333f, 90.0133333333333f, 85.2355555555556f, 88.7711111111111f,
+                88.9622222222222f, 94.1222222222222f, 89.4400000000000f, 88.4844444444444f, 0,
+                0, 0, 0, 0, 85.1400000000000f,
+                0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0
+            };
 
+            var state = method.NoneToPresence(r1, r2);
 
-            //Test FindTrackStartPoint
+            Assert.AreEqual(State.SomeOne, state);
+        }
 
+        [TestMethod()]
+        public void FindTrackStartPointTest()
+        {
             int k1 = 314, k2 = 1256;
-
-            var s1Bd = MatlabReader.ReadAll<double>("s1bd.mat")["s1bd"].ToRowMajorArray().Select(x => (float) x)
-                .ToList();
-            var s2Bd = MatlabReader.ReadAll<double>("s2bd.mat")["s2bd"].ToRowMajorArray().Select(x => (float) x)
-                .ToList();
 
             method.FindTrackStartPoint(s1Bd, s2Bd, ref k1, ref k2);
 
-            if (k1 != 342 || k2 != 708)
-            {
-                Assert.Fail();
-            }
-
-            //
+            Assert.AreEqual(342, k1);
+            Assert.AreEqual(708, k2);
         }
+
+        [TestMethod()]
+        public void GestureTrackTest()
+        {
+            var result = method.FindGestureStartPoint((trackline1, trackline2))
+                .Bind(method.FindGestureStopPoint);
+
+            Assert.AreEqual(false, result.IsSome);
+        }
+
+        [TestMethod()]
+        public void GestureKindTest()
+        {
+            var result2 = method.FindGestureStartPoint((tracklineGesture1, tracklineGesture2))
+                .Bind(method.FindGestureStopPoint)
+                .Match(
+                    x => method.GestureKind(x),
+                    () => State.SomeOne
+                );
+
+            Assert.AreEqual(State.LeftSweep, result2);
+        }
+
     }
 }

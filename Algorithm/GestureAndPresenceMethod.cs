@@ -38,12 +38,15 @@ namespace Algorithm
         private readonly int dev_thref;
         private readonly int non_thre;
         private readonly int mf_ord;
+        private readonly int backd;
         private readonly float R;
         private readonly float dc_thre;
+        private readonly float pdiff_thre;
         private int thre1;
 
         private int npCount = 0;
         public int TrackCount { get; set; } = 0;
+        public int IntervalFlag { get; set; } = 0;
         private int lostCount = 0;
 
         private readonly float[] gest1Ref =
@@ -130,8 +133,10 @@ namespace Algorithm
             dev_thref = configurationData.ConfigurationGroupInt["dev_thref"];
             non_thre = configurationData.ConfigurationGroupInt["non_thre"];
             mf_ord = configurationData.ConfigurationGroupInt["mf_ord"];
+            backd = configurationData.ConfigurationGroupInt["backd"];
             R = configurationData.ConfigurationGroupFloat["R"];
             dc_thre = configurationData.ConfigurationGroupFloat["dc_thre"];
+            pdiff_thre = configurationData.ConfigurationGroupFloat["pdiff_thre"];
 
             ch1 = new List<short[]> {new short[1400], new short[1400]};
             ch2 = new List<short[]> {new short[1400], new short[1400]};
@@ -145,23 +150,35 @@ namespace Algorithm
             }
 
             thre1 = tr_thremi;
-
         }
 
-        public (short[], short[]) Byte2Int16(byte[] bytes)
+        public void Initial((short[], short[]) data)
+        {
+            ch1.Add(data.Item1);
+            ch2.Add(data.Item2);
+
+            ch1.RemoveAt(0);
+            ch2.RemoveAt(0);
+        }
+
+        //public (short[], short[]) Byte2Int16(byte[] bytes)
+        public (short[], short[]) Byte2Int16((short[], short[]) data)
         {
 
-            ch1.Add(new short[1400]);
-            ch2.Add(new short[1400]);
+            //ch1.Add(new short[1400]);
+            //ch2.Add(new short[1400]);
 
-            int k = 0;
+            //int k = 0;
 
-            for (int i = 0; i < bytes.Length; i = i + 4)
-            {
-                ch1[2][k] = (short) BitConverter.ToUInt16(bytes, i);
-                ch2[2][k] = (short) BitConverter.ToUInt16(bytes, i + 2);
-                k++;
-            }
+            //for (int i = 0; i < bytes.Length; i = i + 4)
+            //{
+            //    ch1[2][k] = (short) BitConverter.ToUInt16(bytes, i);
+            //    ch2[2][k] = (short) BitConverter.ToUInt16(bytes, i + 2);
+            //    k++;
+            //}
+
+            ch1.Add(data.Item1);
+            ch2.Add(data.Item2);
 
             var subFrame1 = new short[1400];
             Parallel.For(0, subFrame1.Length, i => { subFrame1[i] = (short) (ch1[2][i] - ch1[0][i]); });
@@ -269,6 +286,7 @@ namespace Algorithm
             if (result1 > 0)
             {
                 TrackCount++;
+
                 trackingLine1.Add(result1);
                 trackingLine1.RemoveAt(0);
 
@@ -285,6 +303,7 @@ namespace Algorithm
                           alpha * trackingLine1[trackingLine1.Count - 2];
 
                 TrackCount++;
+
                 trackingLine1.Add(result1);
                 trackingLine1.RemoveAt(0);
 
@@ -299,6 +318,7 @@ namespace Algorithm
                     k2 = int2_dot;
 
                     var result2 = sbd1.CalculateR(thre2, eu, int1_dot, int2_dot);
+
                     trackingLine2.Add(result2);
                     trackingLine2.RemoveAt(0);
 
@@ -307,10 +327,25 @@ namespace Algorithm
             }
 
             var result3 = sbd1.CalculateR(thre2, eu, int1_dot, int2_dot);
+
             trackingLine2.Add(result3);
             trackingLine2.RemoveAt(0);
 
             return TrackCount > track_len ? Option<(List<float>, List<float>)>.Some((trackingLine1, trackingLine2)) : Option<(List<float>, List<float>)>.None;
+        }
+
+        public Option<(List<float>, List<float>)> CheckInterval((List<float>, List<float>) data)
+        {
+            if (IntervalFlag == 0) return data;
+
+            IntervalFlag++;
+
+            if (IntervalFlag > 60)
+            {
+                IntervalFlag = 0;
+            }
+
+            return Option<(List<float>, List<float>)>.None;
         }
 
         public Option<(int, FindChannelNum, List<float>, List<float>)> FindGestureStartPoint((List<float>, List<float>) trackline)
@@ -342,7 +377,7 @@ namespace Algorithm
             {
                 var rref1 = rref1Temp[ref_lenl / 2];
 
-                for (int i = ref_lenl; i < ref_lenl + fronts; i++)
+                for (int i = ref_lenl + 1; i < ref_lenl + fronts + 1; i++)
                 {
                     if (!(track1Mf[i] < rref1 - gest_thre)) continue;
 
@@ -361,7 +396,7 @@ namespace Algorithm
 
                         if (sum >= diff_win - dthre)
                         {
-                            return Option<(int, FindChannelNum, List<float>, List<float>)>.Some((i + j - 4,
+                            return Option<(int, FindChannelNum, List<float>, List<float>)>.Some((i + j - 8,
                                 FindChannelNum.Channel1Start, track1Mf, track2Mf));
                         }
 
@@ -376,7 +411,7 @@ namespace Algorithm
 
                 var rref2 = rref2Temp[ref_lenl / 2];
 
-                for (int i = ref_lenl; i < ref_lenl + fronts; i++)
+                for (int i = ref_lenl + 1; i < ref_lenl + fronts + 1; i++)
                 {
                     if (!(track2Mf[i] < rref2 - gest_thre)) continue;
 
@@ -395,7 +430,7 @@ namespace Algorithm
 
                         if (sum >= diff_win - dthre)
                         {
-                            return Option<(int, FindChannelNum, List<float>, List<float>)>.Some((i + j - 4,
+                            return Option<(int, FindChannelNum, List<float>, List<float>)>.Some((i + j - 8,
                                 FindChannelNum.Channel2Start, track1Mf, track2Mf));
                         }
 
@@ -414,25 +449,25 @@ namespace Algorithm
             {
                 var track1Mf = data.Item3.ToList();
 
-                for (int k = track1Mf.Count() - 1; k > 0; k--)
+                for (int k = track1Mf.Count(); k > track1Mf.Count() - backd; k--)
                 {
-                    var rref1Temp = track1Mf.GetRange(k - ref_lenl + 1, ref_lenl).OrderByDescending(x => x).ToArray();
+                    var rref1Temp = track1Mf.GetRange(k - ref_lenl - 1, ref_lenl + 1).OrderByDescending(x => x).ToArray();
 
                     if (!(rref1Temp[1] - rref1Temp[rref1Temp.Length - 2] < dev_thref)) continue;
 
                     var rref1 = rref1Temp[ref_lenl / 2];
 
-                    for (int i = k - ref_lenl; i > k - ref_lenl - backs; i--)
+                    for (int i = k - ref_lenl - 1; i > k - ref_lenl - backs; i--)
                     {
                         if (!(track1Mf[i] < rref1 - gest_thre)) continue;
 
-                        var temp1 = track1Mf.GetRange(i - diff_win + 2, diff_win + 1);
+                        var temp1 = track1Mf.GetRange(i - diff_win + 1, diff_win + 1);
 
                         var resultFlag = new List<int>();
 
                         for (int j = 0; j < temp1.Count - 1; j++)
                         {
-                            resultFlag.Add(temp1[j + 1] - temp1[j] < ndiff_thre ? 1 : 0);
+                            resultFlag.Add(temp1[j + 1] - temp1[j] > pdiff_thre ? 1 : 0);
                         }
 
                         var sum = resultFlag.Sum();
@@ -453,25 +488,25 @@ namespace Algorithm
             {
                 var track2Mf = data.Item4.ToList();
 
-                for (int k = track2Mf.Count() - 1; k > 0; k--)
+                for (int k = track2Mf.Count(); k > track2Mf.Count() - backd; k--)
                 {
-                    var rref2Temp = track2Mf.GetRange(k - ref_lenl + 1, ref_lenl).OrderByDescending(x => x).ToArray();
+                    var rref2Temp = track2Mf.GetRange(k - ref_lenl - 1, ref_lenl + 1).OrderByDescending(x => x).ToArray();
 
                     if (!(rref2Temp[1] - rref2Temp[rref2Temp.Length - 2] < dev_thref)) continue;
 
                     var rref2 = rref2Temp[ref_lenl / 2];
 
-                    for (int i = k - ref_lenl; i > k - ref_lenl - backs; i--)
+                    for (int i = k - ref_lenl - 1; i > k - ref_lenl - backs; i--)
                     {
                         if (!(track2Mf[i] < rref2 - gest_thre)) continue;
 
-                        var temp1 = track2Mf.GetRange(i - diff_win + 2, diff_win + 1);
+                        var temp1 = track2Mf.GetRange(i - diff_win + 1, diff_win + 1);
 
                         var resultFlag = new List<int>();
 
                         for (int j = 0; j < temp1.Count - 1; j++)
                         {
-                            resultFlag.Add(temp1[j + 1] - temp1[j] < ndiff_thre ? 1 : 0);
+                            resultFlag.Add(temp1[j + 1] - temp1[j] > pdiff_thre ? 1 : 0);
                         }
 
 
@@ -496,10 +531,10 @@ namespace Algorithm
 
             switch (data.Item1)
             {
-                case FindChannelNum.Channel1Start:
+                case FindChannelNum.Channel1End:
                     gesture.AddRange(data.Item2);
                     break;
-                case FindChannelNum.Channel2Start:
+                case FindChannelNum.Channel2End:
                     gesture.AddRange(data.Item3);
                     break;
                 default:
@@ -511,7 +546,7 @@ namespace Algorithm
             var s1 = temp1.Dtw(gest1Ref);
             var s2 = temp1.Dtw(gest2Ref);
             
-            var temp2 = GestureLikely.None;
+            GestureLikely temp2;
 
             if (s1 >= non_thre && s2 >= non_thre)
             {
@@ -531,8 +566,8 @@ namespace Algorithm
                 temp2 = GestureLikely.Indistinguishable;
             }
 
-            var track1F = data.Item2.MedianFilter(mf_ord);
-            var track2F = data.Item3.MedianFilter(mf_ord);
+            var track1F = data.Item2;
+            var track2F = data.Item3;
 
             var x = track1F.Select((t, i) => track2F[i] * (t - track2F[i]) / R).ToList();
 

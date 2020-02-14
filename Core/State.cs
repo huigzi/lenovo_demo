@@ -16,7 +16,8 @@ namespace Core
         SomeOne = 5,
         OtherGesture = 6,
         DoubleClickRight = 7,
-        DoubleClickMiddle = 8
+        DoubleClickMiddle = 8,
+        TestFlag = 9
     }
 
     public enum PlayerState

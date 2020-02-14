@@ -88,7 +88,6 @@ namespace UI
                     MessageBox.Show("USB Device Not Find. Please restart this software.");
                     logger.WriteToLog("USB Device Not Find.");
                     Environment.Exit(0);
-                    //return;
                 }
             }
             usbServer.Initialize();

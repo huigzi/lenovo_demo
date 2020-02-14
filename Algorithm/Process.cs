@@ -12,11 +12,11 @@ namespace Algorithm
         private int k2;
 
         private readonly int flt_edge = 30;
-        private readonly int pd_thre1 = 10;
-        private readonly int pd_thre2 = 10;
+        private readonly int pd_thre1 = 20;
+        private readonly int pd_thre2 = 20;
         private readonly float eu = 0.095555555555556f;
-        private readonly int int1_dot = 314;
-        private readonly int int2_dot = 1256;
+        private readonly int int1_dot;
+        private readonly int int2_dot;
 
         private readonly ArrayList result;
 
@@ -39,6 +39,9 @@ namespace Algorithm
             pdR1 = new List<float>();
             pdR2 = new List<float>();
 
+            int1_dot = list.ConfigurationGroupInt["int1_dot"];
+            int2_dot = list.ConfigurationGroupInt["int2_dot"];
+
             k1 = int1_dot;
             k2 = int2_dot;
 
@@ -49,12 +52,13 @@ namespace Algorithm
             }
         }
 
-        public ArrayList DataProcess(byte[] bytes)
+        //public ArrayList DataProcess(byte[] bytes)
+        public State DataProcess((short[], short[]) bytes)
         {
             var tmpTuple = gestureAndPresenceMethod.Byte2Int16(bytes);
 
-            var s1Bd = tmpTuple.Item1.BandPassFilter().LowPassFilter().Skip(flt_edge).ToList();
-            var s2Bd = tmpTuple.Item2.BandPassFilter().LowPassFilter().Skip(flt_edge).ToList();
+            var s1Bd = tmpTuple.Item1.BandPassFilter().LowPassFilter().Skip(flt_edge - 1).ToList();
+            var s2Bd = tmpTuple.Item2.BandPassFilter().LowPassFilter().Skip(flt_edge - 1).ToList();
 
             var r1 = s1Bd.CalculateR(pd_thre1, eu, int1_dot, int2_dot);
             var r2 = s2Bd.CalculateR(pd_thre2, eu, int1_dot, int2_dot);
@@ -80,19 +84,22 @@ namespace Algorithm
                 }
                 else
                 {
-                    var result = gestureAndPresenceMethod.TrackComplete(s1Bd, s2Bd, ref k1, ref k2)
-
+                    return gestureAndPresenceMethod.TrackComplete(s1Bd, s2Bd, ref k1, ref k2)
+                        .Bind(gestureAndPresenceMethod.CheckInterval)
                         .Bind(gestureAndPresenceMethod.FindGestureStartPoint)
                         .Bind(gestureAndPresenceMethod.FindGestureStopPoint)
                         .Match(
-                            x => gestureAndPresenceMethod.GestureKind(x),
+                            (x) =>
+                            {
+                                gestureAndPresenceMethod.IntervalFlag = 1;
+                                return gestureAndPresenceMethod.GestureKind(x);
+                            },
                             () => State.SomeOne
                         );
-                    //todo 增加手势间隔判断
                 }
             }
 
-            return null;
+            return currentState;
         }
     }
 }

@@ -107,7 +107,7 @@ namespace Algorithm
             for (int i = windowLength; i < windowLength + data.Count; i++)
             {
                 var temp2 =
-                    temp.GetRange(i - windowLength, 2 * windowLength + 1).OrderByDescending(x => x).ToArray()[windowLength + 1];
+                    temp.GetRange(i - windowLength, 2 * windowLength + 1).OrderByDescending(x => x).ToArray()[windowLength];
                 result.Add(temp2);
             }
 
@@ -136,9 +136,11 @@ namespace Algorithm
             var min = data.Min();
             var mean = data.Average();
 
-            var temp = data.Select(x => x - mean).Select(x => x / (max - min)).Select(x => x - min).ToList();
+            var temp1 = data.Select(x => x - mean).Select(x => x / (max - min)).ToList();
+            min = temp1.Min();
+            var temp2 = temp1.Select(x => x - min).ToList();
 
-            return temp;
+            return temp2;
         }
 
         public static float Dtw(this List<float> data, float[] reference)
