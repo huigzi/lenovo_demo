@@ -26,7 +26,10 @@
     "dev_thref": 5,
     "non_thre": 8,
     "mf_ord": 5,
-    "backd": 5 
+    "backd": 5,
+    "flt_edge": 30,
+    "pd_thre1": 20,
+    "pd_thre2": 20 
   },
   "ConfigurationGroupFloat": {
     "eu": 0.095555555555556,

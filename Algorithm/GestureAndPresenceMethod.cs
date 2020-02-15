@@ -37,7 +37,6 @@ namespace Algorithm
         private readonly int dev_thres;
         private readonly int dev_thref;
         private readonly int non_thre;
-        private readonly int mf_ord;
         private readonly int backd;
         private readonly float R;
         private readonly float dc_thre;
@@ -132,7 +131,6 @@ namespace Algorithm
             dev_thres = configurationData.ConfigurationGroupInt["dev_thres"];
             dev_thref = configurationData.ConfigurationGroupInt["dev_thref"];
             non_thre = configurationData.ConfigurationGroupInt["non_thre"];
-            mf_ord = configurationData.ConfigurationGroupInt["mf_ord"];
             backd = configurationData.ConfigurationGroupInt["backd"];
             R = configurationData.ConfigurationGroupFloat["R"];
             dc_thre = configurationData.ConfigurationGroupFloat["dc_thre"];
@@ -185,6 +183,23 @@ namespace Algorithm
 
             var subFrame2 = new short[1400];
             Parallel.For(0, subFrame2.Length, i => { subFrame2[i] = (short) (ch2[2][i] - ch2[0][i]); });
+
+            ch1.RemoveAt(0);
+            ch2.RemoveAt(0);
+
+            return (subFrame1, subFrame2);
+        }
+
+        public virtual (short[], short[]) TransFormMatData((short[], short[]) data)
+        {
+            ch1.Add(data.Item1);
+            ch2.Add(data.Item2);
+
+            var subFrame1 = new short[1400];
+            Parallel.For(0, subFrame1.Length, i => { subFrame1[i] = (short)(ch1[2][i] - ch1[0][i]); });
+
+            var subFrame2 = new short[1400];
+            Parallel.For(0, subFrame2.Length, i => { subFrame2[i] = (short)(ch2[2][i] - ch2[0][i]); });
 
             ch1.RemoveAt(0);
             ch2.RemoveAt(0);
@@ -377,7 +392,7 @@ namespace Algorithm
             {
                 var rref1 = rref1Temp[ref_lenl / 2];
 
-                for (int i = ref_lenl + 1; i < ref_lenl + fronts + 1; i++)
+                for (int i = ref_lenl + 1; i < ref_lenl + fronts; i++)
                 {
                     if (!(track1Mf[i] < rref1 - gest_thre)) continue;
 
@@ -408,20 +423,19 @@ namespace Algorithm
 
             if (rref2Temp[1] - rref2Temp[rref2Temp.Length - 2] < dev_thres)
             {
-
                 var rref2 = rref2Temp[ref_lenl / 2];
 
-                for (int i = ref_lenl + 1; i < ref_lenl + fronts + 1; i++)
+                for (int i = ref_lenl + 1; i < ref_lenl + fronts; i++)
                 {
                     if (!(track2Mf[i] < rref2 - gest_thre)) continue;
 
-                    var temp1 = track2Mf.GetRange(i - 4, 6 + diff_win);
+                    var temp2 = track2Mf.GetRange(i - 4, 6 + diff_win);
 
                     var resultFlag = new List<int>();
 
-                    for (int j = 0; j < temp1.Count - 1; j++)
+                    for (int j = 0; j < temp2.Count - 1; j++)
                     {
-                        resultFlag.Add(temp1[j + 1] - temp1[j] < ndiff_thre ? 1 : 0);
+                        resultFlag.Add(temp2[j + 1] - temp2[j] < ndiff_thre ? 1 : 0);
                     }
 
                     for (int j = 0; j < 6; j++)
@@ -500,13 +514,13 @@ namespace Algorithm
                     {
                         if (!(track2Mf[i] < rref2 - gest_thre)) continue;
 
-                        var temp1 = track2Mf.GetRange(i - diff_win + 1, diff_win + 1);
+                        var temp2 = track2Mf.GetRange(i - diff_win + 1, diff_win + 1);
 
                         var resultFlag = new List<int>();
 
-                        for (int j = 0; j < temp1.Count - 1; j++)
+                        for (int j = 0; j < temp2.Count - 1; j++)
                         {
-                            resultFlag.Add(temp1[j + 1] - temp1[j] > pdiff_thre ? 1 : 0);
+                            resultFlag.Add(temp2[j + 1] - temp2[j] > pdiff_thre ? 1 : 0);
                         }
 
 

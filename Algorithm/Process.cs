@@ -11,14 +11,12 @@ namespace Algorithm
         private int k1;
         private int k2;
 
-        private readonly int flt_edge = 30;
-        private readonly int pd_thre1 = 20;
-        private readonly int pd_thre2 = 20;
-        private readonly float eu = 0.095555555555556f;
+        private readonly int flt_edge;
+        private readonly int pd_thre1;
+        private readonly int pd_thre2;
+        private readonly float eu;
         private readonly int int1_dot;
         private readonly int int2_dot;
-
-        private readonly ArrayList result;
 
         private State currentState = State.SomeOne;
 
@@ -32,7 +30,6 @@ namespace Algorithm
         public Process(GestureAndPresenceMethod gestureAndPresenceMethod, IReadFile readConfigration)
         {
             this.gestureAndPresenceMethod = gestureAndPresenceMethod;
-            result = new ArrayList(3) {0, null, null};
 
             var list = readConfigration.ReadJsonFile();
 
@@ -41,6 +38,11 @@ namespace Algorithm
 
             int1_dot = list.ConfigurationGroupInt["int1_dot"];
             int2_dot = list.ConfigurationGroupInt["int2_dot"];
+            flt_edge = list.ConfigurationGroupInt["flt_edge"];
+            pd_thre1 = list.ConfigurationGroupInt["pd_thre1"];
+            pd_thre2 = list.ConfigurationGroupInt["pd_thre2"];
+
+            eu = list.ConfigurationGroupFloat["eu"];
 
             k1 = int1_dot;
             k2 = int2_dot;

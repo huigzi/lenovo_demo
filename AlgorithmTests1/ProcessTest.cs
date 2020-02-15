@@ -1,14 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Algorithm;
 using Core;
 using MathNet.Numerics.Data.Matlab;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace UnitMethodTests
+namespace AlgorithmTests
 {
     [TestClass()]
     public class ProcessTest
@@ -44,7 +42,12 @@ namespace UnitMethodTests
                 }
             }
 
-            var finalresult = result.Where(x => x.Item1 != State.SomeOne).ToArray();
+            var finalResult = result.Where(x => x.Item1 != State.SomeOne).ToArray();
+
+            Assert.AreEqual((State.LeftSweep, 134), finalResult[0]);
+            Assert.AreEqual((State.LeftSweep, 482), finalResult[1]);
+            Assert.AreEqual((State.RightSweep, 614), finalResult[2]);
+            Assert.AreEqual((State.LeftSweep, 774), finalResult[3]);
 
         }
     }
