@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core;
+using Core.Interface;
 using LanguageExt;
 
 namespace Algorithm
 {
-    public class GestureAndPresenceMethod
+    public class GestureAndPresenceMethod : IAlgorithmMethod<float>
     {
         private readonly int pdn_thre1;
         private readonly int pdn_thre2;
@@ -81,16 +82,7 @@ namespace Algorithm
         List<float> trackingLine1;
         List<float> trackingLine2;
 
-        public enum FindChannelNum
-        {
-            None = 0,
-            Channel1Start = 1,
-            Channel2Start = 2,
-            Channel1End = 3,
-            Channel2End = 4
-        }
-
-        public enum GestureLikely
+        private enum GestureLikely
         {
             Sweep = 0,
             DoubleClick = 1,
@@ -98,10 +90,9 @@ namespace Algorithm
             None = 4
         }
 
-        public GestureAndPresenceMethod(IReadFile readConfigration)
+        public GestureAndPresenceMethod(IReadFile readConfigrationFile)
         {
-
-            var configurationData = readConfigration.ReadJsonFile();
+            var configurationData = readConfigrationFile.ReadJsonFile();
 
             pdn_thre1 = configurationData.ConfigurationGroupInt["pdn_thre1"];
             pdn_thre2 = configurationData.ConfigurationGroupInt["pdn_thre2"]; 
@@ -559,7 +550,7 @@ namespace Algorithm
 
             var s1 = temp1.Dtw(gest1Ref);
             var s2 = temp1.Dtw(gest2Ref);
-            
+
             GestureLikely temp2;
 
             if (s1 >= non_thre && s2 >= non_thre)
@@ -604,8 +595,8 @@ namespace Algorithm
             }
             else if (temp2 == GestureLikely.Sweep)
             {
-                var leftPart = x.Take(x.Count / 2).OrderBy(item=>item).ToArray();
-                var rightPart = x.Skip(x.Count / 2).OrderBy(item=>item).ToArray();
+                var leftPart = x.Take(x.Count / 2).OrderBy(item => item).ToArray();
+                var rightPart = x.Skip(x.Count / 2).OrderBy(item => item).ToArray();
 
                 var ml = leftPart[leftPart.Length / 2];
                 var mr = rightPart[rightPart.Length / 2];
@@ -617,7 +608,6 @@ namespace Algorithm
             return State.SomeOne;
 
         }
-
     }
 
     

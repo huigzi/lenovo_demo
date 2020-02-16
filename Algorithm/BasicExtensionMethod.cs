@@ -7,7 +7,7 @@ using LanguageExt;
 
 namespace Algorithm
 {
-    public static class BasicMethod
+    public static class BasicExtensionMethod
     {
         private static readonly float[] ABp1 = {1f, -0.090292374147464f, 0.777012688479490f};
         private static readonly float[] ABp2 = {1f, -0.529211627791274f, 0.785710792359040f};

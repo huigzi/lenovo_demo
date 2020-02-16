@@ -50,9 +50,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasicMethod.cs" />
+    <Compile Include="BasicExtensionMethod.cs" />
     <Compile Include="GestureAndPresenceMethod.cs" />
-    <Compile Include="Process.cs" />
+    <Compile Include="AlgorithmFlow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

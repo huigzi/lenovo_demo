@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Core.Interface;
 
 namespace Core
 {
@@ -14,7 +15,7 @@ namespace Core
         Started
     };
 
-    public class SaveData
+    public class SaveData : ISaveData<byte[]>
     {
         private BinaryWriter binaryWriter;
         private string filePath;

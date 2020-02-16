@@ -3,10 +3,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Interface;
 
 namespace Algorithm
 {
-    public class Process
+    public class AlgorithmFlow : IAlgorithmFlow<short[]>
     {
         private int k1;
         private int k2;
@@ -25,9 +26,9 @@ namespace Algorithm
 
         private int recvCount = 0;
 
-        private readonly GestureAndPresenceMethod gestureAndPresenceMethod;
+        private readonly IAlgorithmMethod<float> gestureAndPresenceMethod;
 
-        public Process(GestureAndPresenceMethod gestureAndPresenceMethod, IReadFile readConfigration)
+        public AlgorithmFlow(IAlgorithmMethod<float> gestureAndPresenceMethod, IReadFile readConfigration)
         {
             this.gestureAndPresenceMethod = gestureAndPresenceMethod;
 

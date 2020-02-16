@@ -15,19 +15,10 @@ namespace Core
 
         public MusicPlayer()
         {
-            MusicList = new List<string>();
-            CurrentStatus = PlayerState.Stop;
-        }
-
-        public void PlayerInitial()
-        {
-            MusicList.Add("music1.wav");
-            MusicList.Add("music2.wav");
-            MusicList.Add("music3.wav");
-
+            MusicList = new List<string> {"music1.wav", "music2.wav", "music3.wav"};
             wavePlay = new WaveOut { Volume = 0.5f };
             wavePlay.Init(new AudioFileReader(MusicList[0]));
-
+            CurrentStatus = PlayerState.Stop;
             Volume = 0.2f;
         }
 

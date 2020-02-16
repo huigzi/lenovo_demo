@@ -7,7 +7,9 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Algorithm;
+using Autofac;
 using Core;
+using Core.Interface;
 
 namespace UI
 {
@@ -18,31 +20,25 @@ namespace UI
 
     public partial class MainWindow : Window
     {
+        private readonly IContainer container;
         private readonly MusicPlayer musicPlayer;
-        private readonly UsbServer usbServer;
-        private readonly Logger logger;
-        private readonly SaveData saveData;
-        //private int lampFlag = 0;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            logger = new Logger();
+            var builder = new ContainerBuilder();
+            builder.RegisterType<UsbServer>().As<IService>().SingleInstance();
+            builder.RegisterType<ReadConfiguration>().As<IReadFile>().SingleInstance();
+            builder.RegisterType<GestureAndPresenceMethod>().As<IAlgorithmMethod<float>>().SingleInstance();
+            builder.RegisterType<AlgorithmFlow>().As<IAlgorithmFlow<short[]>>().SingleInstance();
+            builder.RegisterType<MusicPlayer>().SingleInstance();
+            builder.RegisterType<Logger>().As<ILogger>().SingleInstance();
+            builder.RegisterType<SaveData>().As<ISaveData<byte[]>>().SingleInstance();
 
-            musicPlayer = new MusicPlayer();
-            musicPlayer.PlayerInitial();
-
-            saveData = new SaveData();
-
-            var readJson = new ReadConfiguration();
-            var process = new Process(new GestureAndPresenceMethod(readJson), readJson);
             var statusMachine = new StatusMachine();
 
-            //var transformBlock1 = new TransformBlock<byte[], byte[]>(x => saveData.WriteData(x));
-
-            var transformBlock2 = new TransformBlock<byte[], ArrayList>(x => process.DataProcess(x));
-            var actionBlock = new ActionBlock<ArrayList>(x =>
+            var uiActionBlock = new ActionBlock<ArrayList>(x =>
             {
                 //lampFlag = 1 - lampFlag;
 
@@ -65,38 +61,39 @@ namespace UI
                 StateChangeUi(x);
             });
 
-            //transformBlock1.LinkTo(transformBlock2);
-            transformBlock2.LinkTo(actionBlock);
+            builder.RegisterInstance(uiActionBlock).As<ActionBlock<ArrayList>>().SingleInstance();
+            builder.RegisterType<DataFlowBlock>().SingleInstance();
 
-            usbServer = new UsbServer(transformBlock2);
+            container = builder.Build();
+
+            musicPlayer = container.BeginLifetimeScope().Resolve<MusicPlayer>();
         }
 
         private void Window_Loaded(object sender, EventArgs e)
         {
             Screen.Visibility = Visibility.Hidden;
             Screen.Background = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-
             WindowState = WindowState.Maximized;
+
             LastM.Content = musicPlayer.MusicList[0];
             CurrentM.Content = musicPlayer.MusicList[1];
             NextM.Content = musicPlayer.MusicList[2];
 
-            var res = usbServer.UsbFind();
+            try
             {
-                if (res == -1)
-                {
-                    MessageBox.Show("USB Device Not Find. Please restart this software.");
-                    logger.WriteToLog("USB Device Not Find.");
-                    Environment.Exit(0);
-                }
+                container.BeginLifetimeScope().Resolve<IService>().OpenServer();
             }
-            usbServer.Initialize();
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void Window_Closing(object sender, EventArgs e)
         {
-            logger.ShutDown();
-            usbServer.CloseUsb();
+            container.Resolve<ILogger>().ShutDown();
+            container.Resolve<IService>().CloseServer();
+            container.Dispose();
             Environment.Exit(0);
         }
 
@@ -187,8 +184,6 @@ namespace UI
                                 musicPlayer.CurrentStatus = PlayerState.Stop;
                                 break;
                         }
-
-                        logger.WriteToLog("LeftSweep");
                     });
 
                     break;
@@ -218,7 +213,6 @@ namespace UI
                                 break;
                         }
 
-                        logger.WriteToLog("RightSweep");
                     });
                     break;
 
@@ -246,6 +240,8 @@ namespace UI
 
         private void SaveDataButton_Click(object sender, RoutedEventArgs e)
         {
+            var saveData = container.Resolve<ISaveData<byte[]>>();
+
             if (saveData.State == DataState.Started)
             {
                 saveData.StopSave();

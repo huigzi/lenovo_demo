@@ -27,6 +27,16 @@ namespace Core
         Pause = 2
     }
 
+    public enum FindChannelNum
+    {
+        None = 0,
+        Channel1Start = 1,
+        Channel2Start = 2,
+        Channel1End = 3,
+        Channel2End = 4
+    }
+
+
     public class StatusMachine
     {
         public State LastState { get; set; }

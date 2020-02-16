@@ -3,77 +3,82 @@ using LibUsbDotNet.Main;
 using System;
 using System.Collections;
 using System.Threading.Tasks.Dataflow;
+using Core.Interface;
 
 namespace Core
 {
-    public class UsbServer
+    public class UsbServer: IService
     {
         private UsbDevice myUsbDevice;
         private readonly UsbDeviceFinder myUsbFinder;
-        private UsbRegDeviceList regList;
         private UsbEndpointReader reader;
+        private readonly ILogger logger;
         
-        private readonly TransformBlock<byte[], ArrayList> transformBlock;
+        private readonly DataFlowBlock _transformBlock;
 
-        public UsbServer(TransformBlock<byte[], ArrayList> transformBlock)
+        public UsbServer(DataFlowBlock transformBlock, ILogger logger)
         {
             myUsbFinder = new UsbDeviceFinder(0x0483, 0x572B);
-            this.transformBlock = transformBlock;
+            _transformBlock = transformBlock;
+            this.logger = logger;
         }
 
-        public int UsbFind()
+        public class UsbNotFoundException : ApplicationException
         {
-            regList = UsbDevice.AllDevices.FindAll(myUsbFinder);
-            if (regList.Count == 0)
+            public UsbNotFoundException(string message) : base(message)
             {
-                return -1;
+
             }
-            return 0;
         }
 
-        public void Initialize()
+        public void OpenServer()
         {
+            try
+            {
+                if (myUsbDevice != null) throw new NotSupportedException("Device Exits");
+                if (UsbDevice.AllDevices.FindAll(myUsbFinder).Count == 0) throw new UsbNotFoundException("Device Not Found. Please Restart the application");
 
-            if (myUsbDevice != null) return;
+                myUsbDevice = UsbDevice.OpenUsbDevice(myUsbFinder);
+                var wholeUsbDevice = myUsbDevice as IUsbDevice;
 
-            if (regList.Count == 0) return;
+                wholeUsbDevice?.SetConfiguration(1);
+                wholeUsbDevice?.ClaimInterface(0);
 
-            myUsbDevice = UsbDevice.OpenUsbDevice(myUsbFinder);
-            var wholeUsbDevice = myUsbDevice as IUsbDevice;
-
-            wholeUsbDevice?.SetConfiguration(1);
-            wholeUsbDevice?.ClaimInterface(0);
-
-            reader = myUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01);
-            reader.DataReceived += OnRxEndPointData;
-            reader.ReadBufferSize = 10800;
-            reader.Reset();
-            reader.DataReceivedEnabled = true;
+                reader = myUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01);
+                reader.DataReceived += OnRxEndPointData;
+                reader.ReadBufferSize = 10800;
+                reader.Reset();
+                reader.DataReceivedEnabled = true;
+            }
+            catch(UsbNotFoundException e)
+            {
+                logger.WriteToLog(e.ToString());
+                throw e;
+            }
         }
 
         private void OnRxEndPointData(object sender, EndpointDataEventArgs e)
         {
-            transformBlock.Post(e.Buffer);
+            _transformBlock.Post(e.Buffer);
         }
 
-        public void CloseUsb()
+        public void CloseServer()
         {
-            if (myUsbDevice == null) return;
-
-            if (myUsbDevice.IsOpen)
+            try
             {
-                try
+                if (myUsbDevice == null) throw new NullReferenceException("No device closed");
+                if (myUsbDevice.IsOpen)
                 {
                     IUsbDevice wholeUsbDevice = myUsbDevice as IUsbDevice;
                     wholeUsbDevice?.ReleaseInterface(0);
                 }
-                catch (Exception ex)
-                {
-                    Console.Write(ex.ToString());
-                }
+                myUsbDevice = null;
+                UsbDevice.Exit();
             }
-            myUsbDevice = null;
-            UsbDevice.Exit();
+            catch (Exception ex)
+            {
+                logger.WriteToLog(ex.ToString());
+            }
         }
     }
 }

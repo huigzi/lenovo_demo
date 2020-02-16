@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Interface;
 
 namespace Core
 {
-    public class Logger
+    public class Logger : ILogger
     {
         private static NLog.Logger _logger;
 

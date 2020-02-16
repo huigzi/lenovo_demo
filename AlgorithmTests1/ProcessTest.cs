@@ -22,7 +22,7 @@ namespace AlgorithmTests
 
             var method = new GestureAndPresenceMethod(readConfiguration);
 
-            var process = new Process(method, readConfiguration);
+            var process = new AlgorithmFlow(method, readConfiguration);
 
             for (int i = 0; i < ch1Data.ColumnCount; i++)
             {

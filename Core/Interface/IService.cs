@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core
+namespace Core.Interface
 {
-    public class CustomInterceptorAttribute
+    public interface IService
     {
+        void OpenServer();
+        void CloseServer();
     }
 }
