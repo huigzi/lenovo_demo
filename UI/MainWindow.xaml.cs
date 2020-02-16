@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Algorithm;
+using Autofac;
+using Core;
+using Core.Interface;
+using System;
 using System.Collections;
 using System.IO;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Algorithm;
-using Autofac;
-using Core;
-using Core.Interface;
 
 namespace UI
 {
@@ -73,7 +72,6 @@ namespace UI
         {
             Screen.Visibility = Visibility.Hidden;
             Screen.Background = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-            WindowState = WindowState.Maximized;
 
             LastM.Content = musicPlayer.MusicList[0];
             CurrentM.Content = musicPlayer.MusicList[1];
@@ -97,7 +95,7 @@ namespace UI
             Environment.Exit(0);
         }
 
-        private void StateChangeUi(IList arrayList)
+        public void StateChangeUi(IList arrayList)
         {
             switch ((State)arrayList[0])
             {

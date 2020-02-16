@@ -13,19 +13,10 @@ namespace Core
     {
         private TransformBlock<byte[], byte[]> _transformBlock1;
         private TransformBlock<byte[], ArrayList> _transformBlock2;
-        private ActionBlock<ArrayList> _actionBlock;
-
-        private ISaveData<byte[]> saveData;
-        private IAlgorithmFlow<short[]> algorithmFlow;
-        private ActionBlock<ArrayList> action;
 
         public DataFlowBlock(ISaveData<byte[]> saveData, IAlgorithmFlow<short[]> algorithmFlow, ActionBlock<ArrayList> action)
         {
-            this.saveData = saveData;
-            this.algorithmFlow = algorithmFlow;
-            this.action = action;
-
-            _transformBlock1 = new TransformBlock<byte[], byte[]>(x => saveData.WriteData(x));
+            _transformBlock1 = new TransformBlock<byte[], byte[]>(saveData.WriteData);
 
             //_transformBlock2 = new TransformBlock<byte[], ArrayList>(x => algorithmFlow.DataProcess(x));
 
