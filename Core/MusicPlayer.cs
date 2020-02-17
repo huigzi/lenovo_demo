@@ -1,37 +1,34 @@
-﻿using NAudio.Wave;
-using System.Collections.Generic;
+﻿using Core.ViewModel;
+using NAudio.Wave;
 using System.Linq;
 
 namespace Core
 {
     public class MusicPlayer
     {
-        public List<string> MusicList;
-        private  WaveOut wavePlay;
-
+        private WaveOut wavePlay;
+        private MainViewModel viewModel;
         public int Index { get; set; }
         public PlayerState CurrentStatus { get; set; }
         public float Volume { get; set; }
 
-        public MusicPlayer()
+        public MusicPlayer(MainViewModel mainViewModel)
         {
-            MusicList = new List<string> {"music1.wav", "music2.wav", "music3.wav"};
+            viewModel = mainViewModel;
             wavePlay = new WaveOut { Volume = 0.5f };
-            wavePlay.Init(new AudioFileReader(MusicList[0]));
+            wavePlay.Init(new AudioFileReader($"Music" + "/" + viewModel.MusicModels.ToList()[1].MusicName));
             CurrentStatus = PlayerState.Stop;
             Volume = 0.2f;
         }
 
         public void ListLeft()
         {
-            MusicList.Add(MusicList[0]);
-            MusicList.RemoveAt(0);
+            viewModel.ScrollLeft();
         }
 
         public void ListRight()
         {
-            MusicList.Insert(0, MusicList.Last());
-            MusicList.RemoveAt(3);
+            viewModel.ScrollRight();
         }
 
         public void UpdateVolume()
@@ -51,10 +48,9 @@ namespace Core
         public void Play()
         {
             wavePlay = new WaveOut {Volume = 0.2f};
-            wavePlay.Init(new AudioFileReader(MusicList[Index]));
+            wavePlay.Init(new AudioFileReader($"Music" + "/" + viewModel.MusicModels.ToList()[1].MusicName));
             wavePlay.Play();
             CurrentStatus = PlayerState.Start;
-
         }
 
         public void Stop()

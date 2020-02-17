@@ -1,18 +1,13 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using Core.Interface;
+using Newtonsoft.Json;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using Core.Interface;
 
 namespace Core
 {
     public class ReadConfiguration : IReadFile
     {
-        public ConfigurationData ReadJsonFile()
+        public ConfigurationData ReadFile()
         {
             using (var fs = new FileStream("configuration.json", FileMode.Open))
             {

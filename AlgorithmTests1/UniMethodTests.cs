@@ -6,7 +6,7 @@ using Core;
 using MathNet.Numerics.Data.Matlab;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace UnitMethodTests
+namespace AlgorithmTests
 {
     [TestClass()]
     public class UnitMethodTests

@@ -1,9 +1,7 @@
 ﻿using Core;
-using System;
-using System.Collections;
+using Core.Interface;
 using System.Collections.Generic;
 using System.Linq;
-using Core.Interface;
 
 namespace Algorithm
 {
@@ -28,11 +26,11 @@ namespace Algorithm
 
         private readonly IAlgorithmMethod<float> gestureAndPresenceMethod;
 
-        public AlgorithmFlow(IAlgorithmMethod<float> gestureAndPresenceMethod, IReadFile readConfigration)
+        public AlgorithmFlow(IAlgorithmMethod<float> gestureAndPresenceMethod, IReadFile readConfiguration)
         {
             this.gestureAndPresenceMethod = gestureAndPresenceMethod;
 
-            var list = readConfigration.ReadJsonFile();
+            var list = readConfiguration.ReadFile();
 
             pdR1 = new List<float>();
             pdR2 = new List<float>();

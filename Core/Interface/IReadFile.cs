@@ -2,6 +2,6 @@
 {
     public interface IReadFile
     {
-        ConfigurationData ReadJsonFile();
+        ConfigurationData ReadFile();
     }
 }

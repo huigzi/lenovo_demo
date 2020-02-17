@@ -92,7 +92,7 @@ namespace Algorithm
 
         public GestureAndPresenceMethod(IReadFile readConfigrationFile)
         {
-            var configurationData = readConfigrationFile.ReadJsonFile();
+            var configurationData = readConfigrationFile.ReadFile();
 
             pdn_thre1 = configurationData.ConfigurationGroupInt["pdn_thre1"];
             pdn_thre2 = configurationData.ConfigurationGroupInt["pdn_thre2"]; 

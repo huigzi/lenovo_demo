@@ -1,9 +1,7 @@
-﻿using LibUsbDotNet;
+﻿using Core.Interface;
+using LibUsbDotNet;
 using LibUsbDotNet.Main;
 using System;
-using System.Collections;
-using System.Threading.Tasks.Dataflow;
-using Core.Interface;
 
 namespace Core
 {
