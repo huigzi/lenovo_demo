@@ -76,6 +76,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="gesture_standing100.mat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

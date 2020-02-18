@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Core.Entity;
 using Core.Interface;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using OxyPlot;
 
 namespace Core.ViewModel
 {
@@ -26,6 +28,21 @@ namespace Core.ViewModel
         }
 
         public ObservableCollection<MusicModel> MusicModels { get; set; }
+        public IList<DataPoint> Points { get; set; }
+
+
+        private float volume;
+
+        public float Volume
+        {
+            get => volume;
+            set
+            {
+                volume = value;
+                RaisePropertyChanged();
+            }
+        }
+
 
         public RelayCommand ScrollLeftCommand { get; set; }
         public RelayCommand ScrollRightCommand { get; set; }
@@ -38,6 +55,16 @@ namespace Core.ViewModel
                 new MusicModel {FilePath = "Profile/people1.jpg", MusicName = "psychopass.wav", Color = "#DBF2EF"},
                 new MusicModel {FilePath = "Profile/people2.jpg", MusicName = "IdealLife.wav", Color = "#FEA3B2"},
                 new MusicModel {FilePath = "Profile/people3.jpg", MusicName = "SybilaSystem.wav", Color = "#AABF86"}
+            };
+
+            Points = new List<DataPoint>
+            {
+                new DataPoint(0, 4),
+                new DataPoint(10, 13),
+                new DataPoint(20, 15),
+                new DataPoint(30, 16),
+                new DataPoint(40, 12),
+                new DataPoint(50, 12)
             };
         }
 

@@ -1,4 +1,7 @@
-﻿namespace Core
+﻿using System.Linq;
+using Core.ViewModel;
+
+namespace Core
 {
     public enum State
     {
@@ -33,8 +36,93 @@
 
     public class StatusMachine
     {
-        public State LastState { get; set; }
-        public StatusMachine() => LastState = State.SomeOne;
-    }
+        private State lastState;
 
+        private readonly MusicPlayer musicPlayer;
+        private readonly MainViewModel mainViewModel;
+
+        public StatusMachine(MainViewModel mainViewModel)
+        {
+            musicPlayer = new MusicPlayer($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName);
+            this.mainViewModel = mainViewModel;
+            this.mainViewModel.Volume = 0.2f;
+            lastState = State.SomeOne;
+        }
+
+        public void StateChanged(State state)
+        {
+            if (state == lastState) return;
+
+            switch (state)
+            {
+                case State.DoubleClickMiddle:
+
+                    switch (musicPlayer.CurrentStatus)
+                    {
+                        case PlayerState.Start:
+                            musicPlayer.Pause();
+                            musicPlayer.CurrentStatus = PlayerState.Pause;
+                            break;
+                        case PlayerState.Pause:
+                            musicPlayer.Resume();
+                            musicPlayer.CurrentStatus = PlayerState.Start;
+                            break;
+                        case PlayerState.Stop:
+          
+                            musicPlayer.Play($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName);
+                            musicPlayer.CurrentStatus = PlayerState.Start;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+
+                case State.Circle:
+                    mainViewModel.Volume = musicPlayer.UpdateVolume();
+                    break;
+
+                case State.LeftSweep:
+
+                    mainViewModel.ScrollLeft();
+
+                    switch (musicPlayer.CurrentStatus)
+                    {
+                        case PlayerState.Start:
+                            musicPlayer.Stop();
+                            musicPlayer.Play($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName);
+                            break;
+                        case PlayerState.Pause:
+                            musicPlayer.Stop();
+                            musicPlayer.CurrentStatus = PlayerState.Stop;
+                            break;
+                    }
+                    break;
+
+                case State.RightSweep:
+
+                    mainViewModel.ScrollRight();
+
+                    switch (musicPlayer.CurrentStatus)
+                    {
+                        case PlayerState.Start:
+                            musicPlayer.Stop();
+                            musicPlayer.Play($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName);
+                            break;
+                        case PlayerState.Pause:
+                            musicPlayer.Stop();
+                            musicPlayer.CurrentStatus = PlayerState.Stop;
+                            break;
+                    }
+                    break;
+
+                case State.OtherGesture:
+                    break;
+
+                default:
+                    break;
+            }
+
+            lastState = state;
+        }
+    }
 }

@@ -12,12 +12,12 @@ namespace Core
         private UsbEndpointReader reader;
         private readonly ILogger logger;
         
-        private readonly DataFlowBlock _transformBlock;
+        private readonly DataFlowBlock transformBlock;
 
         public UsbServer(DataFlowBlock transformBlock, ILogger logger)
         {
             myUsbFinder = new UsbDeviceFinder(0x0483, 0x572B);
-            _transformBlock = transformBlock;
+            this.transformBlock = transformBlock;
             this.logger = logger;
         }
 
@@ -57,7 +57,7 @@ namespace Core
 
         private void OnRxEndPointData(object sender, EndpointDataEventArgs e)
         {
-            _transformBlock.Post(e.Buffer);
+            transformBlock.Post(e.Buffer);
         }
 
         public void CloseServer()
