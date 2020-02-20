@@ -13,6 +13,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgorithmTests", "AlgorithmTests1\AlgorithmTests.csproj", "{AF3F758F-4680-4C93-B0F4-B201B9B06288}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UITests", "UITests\UITests.csproj", "{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,14 @@ Global
 		{AF3F758F-4680-4C93-B0F4-B201B9B06288}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AF3F758F-4680-4C93-B0F4-B201B9B06288}.Release|x64.ActiveCfg = Release|Any CPU
 		{AF3F758F-4680-4C93-B0F4-B201B9B06288}.Release|x64.Build.0 = Release|Any CPU
+		{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}.Debug|x64.Build.0 = Debug|Any CPU
+		{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}.Release|x64.ActiveCfg = Release|Any CPU
+		{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

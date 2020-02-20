@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Algorithm;
 using Core;
@@ -8,7 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlgorithmTests
 {
-    [TestClass()]
+    [TestClass]
     public class UnitMethodTests
     {
         private GestureAndPresenceMethod method = new GestureAndPresenceMethod(new ReadConfiguration());
@@ -37,7 +38,12 @@ namespace AlgorithmTests
         [TestMethod()]
         public void FilterTest()
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             var result1 = signalData.BandPassFilter().LowPassFilter();
+            sw.Stop();
+            //获取运行时间[毫秒]  
+            var times = sw.Elapsed.TotalMilliseconds;
         }
 
         [TestMethod()]
@@ -118,8 +124,15 @@ namespace AlgorithmTests
         [TestMethod()]
         public void GestureTrackTest()
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             var result = method.FindGestureStartPoint((trackline1, trackline2))
                 .Bind(method.FindGestureStopPoint);
+
+            sw.Stop();
+            //获取运行时间[毫秒]  
+            var times = sw.Elapsed.TotalMilliseconds;
 
             Assert.AreEqual(false, result.IsSome);
         }
@@ -127,12 +140,19 @@ namespace AlgorithmTests
         [TestMethod()]
         public void GestureKindTest()
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             var result2 = method.FindGestureStartPoint((tracklineGesture1, tracklineGesture2))
                 .Bind(method.FindGestureStopPoint)
                 .Match(
                     x => method.GestureKind(x),
                     () => State.SomeOne
                 );
+
+            sw.Stop();
+            //获取运行时间[毫秒]  
+            var times = sw.Elapsed.TotalMilliseconds;
 
             Assert.AreEqual(State.LeftSweep, result2);
         }

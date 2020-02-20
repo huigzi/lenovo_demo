@@ -46,7 +46,7 @@ namespace UI
         {
             try
             {
-                container.BeginLifetimeScope().Resolve<IService>().OpenServer();
+                container.Resolve<IService>().OpenServer();
             }
             catch(Exception ex)
             {
