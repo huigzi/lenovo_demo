@@ -262,6 +262,16 @@ namespace Algorithm
                 trackingLine1.Add(result1);
                 trackingLine1.RemoveAt(0);
 
+
+                if (k1 < int1_dot)
+                {
+                    k1 = int1_dot;
+                }
+                if (k2 > int2_dot)
+                {
+                    k2 = int2_dot;
+                }
+
                 k1 = (int) Math.Ceiling((result1 - gatel) / eu);
                 k2 = (int) Math.Ceiling((result1 + gateu) / eu);
 
@@ -288,6 +298,15 @@ namespace Algorithm
         public Option<(List<float>, List<float>)> TrackComplete(List<float> sbd1, List<float> sbd2, ref int k1, ref int k2)
         {
             var result1 = sbd2.CalculateR(thre1, eu, k1, k2);
+
+            if (k1 < int1_dot)
+            {
+                k1 = int1_dot;
+            }
+            if (k2 > int2_dot)
+            {
+                k2 = int2_dot;
+            }
 
             if (result1 > 0)
             {
