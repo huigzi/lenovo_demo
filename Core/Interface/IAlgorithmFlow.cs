@@ -9,6 +9,10 @@ namespace Core.Interface
     public interface IAlgorithmFlow<T> where T : class
     {
         State DataProcess((T, T) bytes);
+
+        State DataProcess(byte[] bytes);
+
+        void DataInitial(byte[] bytes);
     }
 
 }

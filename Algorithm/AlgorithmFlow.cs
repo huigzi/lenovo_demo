@@ -53,10 +53,63 @@ namespace Algorithm
             }
         }
 
-        //public ArrayList DataProcess(byte[] bytes)
-        public State DataProcess((short[], short[]) bytes)
+        public void DataInitial(byte[] bytes)
+        {
+            gestureAndPresenceMethod.Initial(bytes);
+        }
+
+        public State DataProcess(byte[] bytes)
         {
             var tmpTuple = gestureAndPresenceMethod.Byte2Int16(bytes);
+
+            var s1Bd = tmpTuple.Item1.BandPassFilter().LowPassFilter().Skip(flt_edge - 1).ToList();
+            var s2Bd = tmpTuple.Item2.BandPassFilter().LowPassFilter().Skip(flt_edge - 1).ToList();
+
+            var r1 = s1Bd.CalculateR(pd_thre1, eu, int1_dot, int2_dot);
+            var r2 = s2Bd.CalculateR(pd_thre2, eu, int1_dot, int2_dot);
+
+            pdR1.Add(r1);
+            pdR2.Add(r2);
+            pdR1.RemoveAt(0);
+            pdR2.RemoveAt(0);
+
+            recvCount++;
+
+            if (recvCount > 19)
+            {
+                recvCount = 0;
+                currentState = currentState == State.NoOne ? gestureAndPresenceMethod.NoneToPresence(pdR1, pdR2) : gestureAndPresenceMethod.PresenceToNone(pdR1, pdR2);
+            }
+
+            if (currentState == State.SomeOne)
+            {
+                if (gestureAndPresenceMethod.TrackCount < 5)
+                {
+                    gestureAndPresenceMethod.FindTrackStartPoint(s1Bd, s2Bd, ref k1, ref k2);
+                }
+                else
+                {
+                    return gestureAndPresenceMethod.TrackComplete(s1Bd, s2Bd, ref k1, ref k2)
+                        .Bind(gestureAndPresenceMethod.CheckInterval)
+                        .Bind(gestureAndPresenceMethod.FindGestureStartPoint)
+                        .Bind(gestureAndPresenceMethod.FindGestureStopPoint)
+                        .Match(
+                            (x) =>
+                            {
+                                gestureAndPresenceMethod.IntervalFlag = 1;
+                                return gestureAndPresenceMethod.GestureKind(x);
+                            },
+                            () => State.SomeOne
+                        );
+                }
+            }
+
+            return currentState;
+        }
+
+        public State DataProcess((short[], short[]) data)
+        {
+            var tmpTuple = gestureAndPresenceMethod.Int16PreProcess(data);
 
             var s1Bd = tmpTuple.Item1.BandPassFilter().LowPassFilter().Skip(flt_edge - 1).ToList();
             var s2Bd = tmpTuple.Item2.BandPassFilter().LowPassFilter().Skip(flt_edge - 1).ToList();

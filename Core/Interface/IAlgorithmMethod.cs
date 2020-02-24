@@ -12,7 +12,11 @@ namespace Core.Interface
         int TrackCount { get; set; }
         int IntervalFlag { get; set; }
 
-        (short[], short[]) Byte2Int16((short[], short[]) data);
+        (short[], short[]) Byte2Int16(byte[] bytes);
+
+        (short[], short[]) Int16PreProcess((short[], short[]) data);
+
+        void Initial(byte[] bytes);
 
         State PresenceToNone(List<T> r1, List<T> r2);
 

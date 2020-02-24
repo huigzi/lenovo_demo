@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows.Threading;
 using Core.Entity;
 using Core.Interface;
 using GalaSoft.MvvmLight;
@@ -16,6 +17,7 @@ namespace Core.ViewModel
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
         private ISaveData<byte[]> saveData;
+        private Dispatcher dispatcher;
 
         public MainViewModel(ISaveData<byte[]> saveData)
         {
@@ -25,6 +27,7 @@ namespace Core.ViewModel
             ScrollLeftCommand = new RelayCommand(ScrollLeft);
             ScrollRightCommand = new RelayCommand(ScrollRight);
             SaveDataCommand = new RelayCommand(SaveData);
+            dispatcher = Dispatcher.CurrentDispatcher;
         }
 
         public ObservableCollection<MusicModel> MusicModels { get; set; }
@@ -43,6 +46,17 @@ namespace Core.ViewModel
             }
         }
 
+        private string color;
+
+        public string Color
+        {
+            get => color; 
+            set 
+            {
+                color = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public RelayCommand ScrollLeftCommand { get; set; }
         public RelayCommand ScrollRightCommand { get; set; }
@@ -82,16 +96,22 @@ namespace Core.ViewModel
 
         public void ScrollLeft()
         {
-            var tempItem = MusicModels[0];
-            MusicModels.RemoveAt(0);
-            MusicModels.Add(tempItem);
+            dispatcher.Invoke(() =>
+            {
+                MusicModel tempItem = MusicModels[0];
+                MusicModels.RemoveAt(0);
+                MusicModels.Add(tempItem);
+            });
         }
 
         public void ScrollRight()
         {
-            var tempItem = MusicModels[2];
-            MusicModels.RemoveAt(2);
-            MusicModels.Insert(0, tempItem);
+            dispatcher.Invoke(() =>
+            {
+                var tempItem = MusicModels[2];
+                MusicModels.RemoveAt(2);
+                MusicModels.Insert(0, tempItem);
+            });
         }
     }
 }

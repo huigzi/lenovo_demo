@@ -44,7 +44,7 @@ namespace Core
 
                 reader = myUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01);
                 reader.DataReceived += OnRxEndPointData;
-                reader.ReadBufferSize = 10800;
+                reader.ReadBufferSize = 5600;
                 reader.Reset();
                 reader.DataReceivedEnabled = true;
             }

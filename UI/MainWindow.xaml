@@ -7,8 +7,9 @@
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
         Title="Demo" Height="300" Width="600" Loaded="Window_Loaded" Closing="Window_Closing">
+
     <Grid Background="#F5F6FA">
-        <Grid.RowDefinitions>
+            <Grid.RowDefinitions>
             <RowDefinition Height="3*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
@@ -60,6 +61,7 @@
             <Button Width="20" x:Name="TestButton" Command="{Binding ScrollLeftCommand}"/>
         </StackPanel>
     </Grid>
- 
+
+
 </Window>
 

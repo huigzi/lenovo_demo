@@ -46,6 +46,7 @@ namespace Core
             musicPlayer = new MusicPlayer($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName);
             this.mainViewModel = mainViewModel;
             this.mainViewModel.Volume = 0.2f;
+            this.mainViewModel.Color = "Black";
             lastState = State.SomeOne;
         }
 
@@ -77,8 +78,12 @@ namespace Core
                     }
                     break;
 
-                case State.Circle:
-                    mainViewModel.Volume = musicPlayer.UpdateVolume();
+                case State.DoubleClickLeft:
+                    mainViewModel.Volume = musicPlayer.DownVolume();
+                    break;
+
+                case State.DoubleClickRight:
+                    mainViewModel.Volume = musicPlayer.UpVolume();
                     break;
 
                 case State.LeftSweep:

@@ -20,18 +20,34 @@ namespace Core
             volume = 0.2f;
         }
 
-        public float UpdateVolume()
+        public float UpVolume()
         {
             if (wavePlay == null) throw new NullReferenceException("wavePlay not found");
+
+            if (volume >= 0.8f)
+            {
+                wavePlay.Volume = 0.8f;
+                volume = 0.8f;
+            }
 
             wavePlay.Volume += 0.2f;
             volume += 0.2f;
 
-            if (volume > 0.8f)
+            return wavePlay.Volume;
+        }
+
+        public float DownVolume()
+        {
+            if (wavePlay == null) throw new NullReferenceException("wavePlay not found");
+
+            if (volume <= 0.2f)
             {
                 wavePlay.Volume = 0.2f;
                 volume = 0.2f;
             }
+
+            wavePlay.Volume -= 0.2f;
+            volume -= 0.2f;
 
             return wavePlay.Volume;
         }

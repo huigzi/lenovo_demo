@@ -15,6 +15,7 @@ namespace Algorithm
         private readonly int migr_thre1;
         private readonly int migr_thre2;
         private readonly int np_count_thre;
+
         private readonly int tr_thremi;
         private readonly int init_len;
         private readonly float eu;
@@ -150,8 +151,51 @@ namespace Algorithm
             ch2.RemoveAt(0);
         }
 
-        //public (short[], short[]) Byte2Int16(byte[] bytes)
-        public (short[], short[]) Byte2Int16((short[], short[]) data)
+        public void Initial(byte[] bytes)
+        {
+            ch1.Add(new short[1400]);
+            ch2.Add(new short[1400]);
+
+            int k = 0;
+
+            for (int i = 0; i < bytes.Length; i = i + 4)
+            {
+                ch1[2][k] = (short)BitConverter.ToUInt16(bytes, i);
+                ch2[2][k] = (short)BitConverter.ToUInt16(bytes, i + 2);
+                k++;
+            }
+
+            ch1.RemoveAt(0);
+            ch2.RemoveAt(0);
+        }
+
+        public (short[], short[]) Byte2Int16(byte[] bytes)
+        {
+            ch1.Add(new short[1400]);
+            ch2.Add(new short[1400]);
+
+            int k = 0;
+
+            for (int i = 0; i < bytes.Length; i = i + 4)
+            {
+                ch1[2][k] = (short)BitConverter.ToUInt16(bytes, i);
+                ch2[2][k] = (short)BitConverter.ToUInt16(bytes, i + 2);
+                k++;
+            }
+
+            var subFrame1 = new short[1400];
+            Parallel.For(0, subFrame1.Length, i => { subFrame1[i] = (short)(ch1[2][i] - ch1[0][i]); });
+
+            var subFrame2 = new short[1400];
+            Parallel.For(0, subFrame2.Length, i => { subFrame2[i] = (short)(ch2[2][i] - ch2[0][i]); });
+
+            ch1.RemoveAt(0);
+            ch2.RemoveAt(0);
+
+            return (subFrame1, subFrame2);
+        }
+
+        public (short[], short[]) Int16PreProcess((short[], short[]) data)
         {
 
             //ch1.Add(new short[1400]);
@@ -254,6 +298,16 @@ namespace Algorithm
 
         public int FindTrackStartPoint(List<float> sbd1, List<float> sbd2, ref int k1, ref int k2)
         {
+
+            if (k1 < int1_dot - 1)
+            {
+                k1 = int1_dot - 1;
+            }
+            if (k2 > int2_dot - 1)
+            {
+                k2 = int2_dot - 1;
+            }
+
             var result1 = sbd2.CalculateR(thre1, eu, k1, k2);
 
             if (result1 > 0)
@@ -262,15 +316,6 @@ namespace Algorithm
                 trackingLine1.Add(result1);
                 trackingLine1.RemoveAt(0);
 
-
-                if (k1 < int1_dot)
-                {
-                    k1 = int1_dot;
-                }
-                if (k2 > int2_dot)
-                {
-                    k2 = int2_dot;
-                }
 
                 k1 = (int) Math.Ceiling((result1 - gatel) / eu);
                 k2 = (int) Math.Ceiling((result1 + gateu) / eu);
@@ -297,16 +342,16 @@ namespace Algorithm
 
         public Option<(List<float>, List<float>)> TrackComplete(List<float> sbd1, List<float> sbd2, ref int k1, ref int k2)
         {
-            var result1 = sbd2.CalculateR(thre1, eu, k1, k2);
+            if (k1 < int1_dot - 1)
+            {
+                k1 = int1_dot - 1;
+            }
+            if (k2 > int2_dot - 1)
+            {
+                k2 = int2_dot - 1;
+            }
 
-            if (k1 < int1_dot)
-            {
-                k1 = int1_dot;
-            }
-            if (k2 > int2_dot)
-            {
-                k2 = int2_dot;
-            }
+            var result1 = sbd2.CalculateR(thre1, eu, k1, k2);
 
             if (result1 > 0)
             {
