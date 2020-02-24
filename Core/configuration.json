@@ -37,6 +37,6 @@
     "ndiff_thre": -2,
     "pdiff_thre": 1,
     "R": 14.5,
-    "dc_thre": 0.5
+    "dc_thre": 0.7
   }
 }
