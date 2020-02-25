@@ -2,6 +2,7 @@
 using Core.Interface;
 using System.Collections.Generic;
 using System.Linq;
+using Core.ViewModel;
 
 namespace Algorithm
 {
@@ -25,10 +26,12 @@ namespace Algorithm
         private int recvCount = 0;
 
         private readonly IAlgorithmMethod<float> gestureAndPresenceMethod;
+        private readonly MainViewModel mainViewModel;
 
-        public AlgorithmFlow(IAlgorithmMethod<float> gestureAndPresenceMethod, IReadFile readConfiguration)
+        public AlgorithmFlow(IAlgorithmMethod<float> gestureAndPresenceMethod, IReadFile readConfiguration, MainViewModel mainViewModel)
         {
             this.gestureAndPresenceMethod = gestureAndPresenceMethod;
+            this.mainViewModel = mainViewModel;
 
             var list = readConfiguration.ReadFile();
 
@@ -96,6 +99,8 @@ namespace Algorithm
                         .Match(
                             (x) =>
                             {
+                                mainViewModel.Plot(x.Item2, x.Item3);
+
                                 gestureAndPresenceMethod.IntervalFlag = 1;
                                 return gestureAndPresenceMethod.GestureKind(x);
                             },
@@ -145,6 +150,8 @@ namespace Algorithm
                         .Match(
                             (x) =>
                             {
+                                mainViewModel.Plot(x.Item2, x.Item3);
+
                                 gestureAndPresenceMethod.IntervalFlag = 1;
                                 return gestureAndPresenceMethod.GestureKind(x);
                             },

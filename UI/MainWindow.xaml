@@ -17,12 +17,12 @@
         <UniformGrid Columns="2" Grid.Row="0">
             <oxy:Plot Title="图1" Margin="20" Background="{Binding Background}">
                 <oxy:Plot.Series>
-                    <oxy:LineSeries ItemsSource="{Binding Points}"/>
+                    <oxy:LineSeries ItemsSource="{Binding Points1}"/>
                 </oxy:Plot.Series>
             </oxy:Plot>
             <oxy:Plot Title="图2" Margin="20" Background="{Binding Background}">
                 <oxy:Plot.Series>
-                    <oxy:LineSeries ItemsSource="{Binding Points}"/>
+                    <oxy:LineSeries ItemsSource="{Binding Points2}"/>
                 </oxy:Plot.Series>
             </oxy:Plot>
         </UniformGrid>
@@ -59,6 +59,7 @@
                      TickPlacement="TopLeft"
                      Ticks="0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1"/>
             <Button Width="20" x:Name="TestButton" Command="{Binding ScrollLeftCommand}"/>
+            <Label Width="100" Content="{Binding Status}" VerticalAlignment="Center" FontSize="26"/>
         </StackPanel>
     </Grid>
 

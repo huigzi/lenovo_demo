@@ -31,7 +31,9 @@ namespace Core.ViewModel
         }
 
         public ObservableCollection<MusicModel> MusicModels { get; set; }
-        public IList<DataPoint> Points { get; set; }
+
+        public IList<DataPoint> Points1 { get; set; }
+        public IList<DataPoint> Points2 { get; set; }
 
 
         private float volume;
@@ -46,17 +48,18 @@ namespace Core.ViewModel
             }
         }
 
-        private string color;
+        private string status;
 
-        public string Color
+        public string Status
         {
-            get => color; 
-            set 
+            get => status;
+            set
             {
-                color = value;
+                status = value;
                 RaisePropertyChanged();
             }
         }
+
 
         public RelayCommand ScrollLeftCommand { get; set; }
         public RelayCommand ScrollRightCommand { get; set; }
@@ -66,20 +69,14 @@ namespace Core.ViewModel
         {
             MusicModels = new ObservableCollection<MusicModel>
             {
-                new MusicModel {FilePath = "Profile/people1.jpg", MusicName = "psychopass.wav", Color = "#DBF2EF"},
-                new MusicModel {FilePath = "Profile/people2.jpg", MusicName = "IdealLife.wav", Color = "#FEA3B2"},
-                new MusicModel {FilePath = "Profile/people3.jpg", MusicName = "SybilaSystem.wav", Color = "#AABF86"}
+                new MusicModel {FilePath = "Profile/people1.jpg", MusicName = "Psychopass", Color = "#DBF2EF"},
+                new MusicModel {FilePath = "Profile/people2.jpg", MusicName = "IdealLife", Color = "#FEA3B2"},
+                new MusicModel {FilePath = "Profile/people3.jpg", MusicName = "SybilaSystem", Color = "#AABF86"}
             };
 
-            Points = new List<DataPoint>
-            {
-                new DataPoint(0, 4),
-                new DataPoint(10, 13),
-                new DataPoint(20, 15),
-                new DataPoint(30, 16),
-                new DataPoint(40, 12),
-                new DataPoint(50, 12)
-            };
+            Points1 = new ObservableCollection<DataPoint>();
+            Points2 = new ObservableCollection<DataPoint>();
+
         }
 
         private void SaveData()
@@ -98,7 +95,7 @@ namespace Core.ViewModel
         {
             dispatcher.Invoke(() =>
             {
-                MusicModel tempItem = MusicModels[0];
+                var tempItem = MusicModels[0];
                 MusicModels.RemoveAt(0);
                 MusicModels.Add(tempItem);
             });
@@ -111,6 +108,25 @@ namespace Core.ViewModel
                 var tempItem = MusicModels[2];
                 MusicModels.RemoveAt(2);
                 MusicModels.Insert(0, tempItem);
+            });
+        }
+
+        public void Plot(List<float> tr1, List<float> tr2)
+        {
+            dispatcher.Invoke(() =>
+            {
+                Points1.Clear();
+                Points2.Clear();
+
+                for (int i = 0; i < tr1.Count; i++)
+                {
+                    Points1.Add(new DataPoint(i + 1, tr1[i]));
+                }
+
+                for (int i = 0; i < tr2.Count; i++)
+                {
+                    Points2.Add(new DataPoint(i + 1, tr2[i]));
+                }
             });
         }
     }

@@ -43,10 +43,9 @@ namespace Core
 
         public StatusMachine(MainViewModel mainViewModel)
         {
-            musicPlayer = new MusicPlayer($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName);
+            musicPlayer = new MusicPlayer($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName + ".wav");
             this.mainViewModel = mainViewModel;
             this.mainViewModel.Volume = 0.2f;
-            this.mainViewModel.Color = "Black";
             lastState = State.SomeOne;
         }
 
@@ -69,8 +68,7 @@ namespace Core
                             musicPlayer.CurrentStatus = PlayerState.Start;
                             break;
                         case PlayerState.Stop:
-          
-                            musicPlayer.Play($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName);
+                            musicPlayer.Play($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName + ".wav");
                             musicPlayer.CurrentStatus = PlayerState.Start;
                             break;
                         default:
@@ -94,7 +92,7 @@ namespace Core
                     {
                         case PlayerState.Start:
                             musicPlayer.Stop();
-                            musicPlayer.Play($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName);
+                            musicPlayer.Play($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName + ".wav");
                             break;
                         case PlayerState.Pause:
                             musicPlayer.Stop();
@@ -111,7 +109,7 @@ namespace Core
                     {
                         case PlayerState.Start:
                             musicPlayer.Stop();
-                            musicPlayer.Play($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName);
+                            musicPlayer.Play($"Music" + "/" + mainViewModel.MusicModels.ToList()[1].MusicName + ".wav");
                             break;
                         case PlayerState.Pause:
                             musicPlayer.Stop();

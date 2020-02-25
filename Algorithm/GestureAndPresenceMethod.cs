@@ -430,11 +430,11 @@ namespace Algorithm
                 trackline.Item2[trackline.Item2.Count - 1] = trackline.Item2[trackline.Item2.Count - 2];
             }
 
-            for (int i = 1; i < trackline.Item2.Count - 1; i++)
+            for (int i = 2; i < trackline.Item2.Count - 1; i++)
             {
                 if (trackline.Item2[i] == 0)
                 {
-                    trackline.Item2[i] = (trackline.Item2[i - 1] + trackline.Item2[i + 1]) / 2;
+                    trackline.Item2[i] = trackline.Item2[i - 1] * (1 + alpha) - alpha * trackline.Item2[i - 2];
                 }
             }
 
