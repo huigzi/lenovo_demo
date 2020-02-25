@@ -693,7 +693,7 @@ namespace Algorithm
 
             }
 
-            return State.SomeOne;
+            return State.OtherGesture;
 
         }
     }

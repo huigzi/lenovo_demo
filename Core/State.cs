@@ -59,6 +59,7 @@ namespace Core
             {
                 case State.DoubleClickMiddle:
 
+                    mainViewModel.Status = $"中间双击";
                     switch (musicPlayer.CurrentStatus)
                     {
                         case PlayerState.Start:
@@ -79,15 +80,18 @@ namespace Core
                     break;
 
                 case State.DoubleClickLeft:
+                    mainViewModel.Status = $"左边双击";
                     mainViewModel.Volume = musicPlayer.DownVolume();
                     break;
 
                 case State.DoubleClickRight:
+                    mainViewModel.Status = $"右边双击";
                     mainViewModel.Volume = musicPlayer.UpVolume();
                     break;
 
                 case State.LeftSweep:
 
+                    mainViewModel.Status = $"左滑";
                     mainViewModel.ScrollLeft();
 
                     switch (musicPlayer.CurrentStatus)
@@ -105,6 +109,7 @@ namespace Core
 
                 case State.RightSweep:
 
+                    mainViewModel.Status = $"右划";
                     mainViewModel.ScrollRight();
 
                     switch (musicPlayer.CurrentStatus)
@@ -121,6 +126,7 @@ namespace Core
                     break;
 
                 case State.OtherGesture:
+                    mainViewModel.Status = $"其它类型";
                     break;
 
                 default:

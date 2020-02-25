@@ -14,10 +14,10 @@ namespace Core
 
         public MusicPlayer(string musicFullPath)
         {
-            wavePlay = new WaveOut { Volume = 0.5f };
+            volume = 0.2f;
+            wavePlay = new WaveOut { Volume = volume };
             wavePlay.Init(new AudioFileReader(musicFullPath));
             CurrentStatus = PlayerState.Stop;
-            volume = 0.2f;
         }
 
         public float UpVolume()
@@ -26,14 +26,14 @@ namespace Core
 
             try
             {
-                if (volume >= 0.8f)
+                if (wavePlay.Volume >= 0.8f)
                 {
                     wavePlay.Volume = 0.8f;
                     volume = 0.8f;
                 }
 
-                wavePlay.Volume += 0.2f;
-                volume += 0.2f;
+                wavePlay.Volume += 0.1f;
+                volume += 0.1f;
 
                 return wavePlay.Volume;
             }
@@ -49,14 +49,14 @@ namespace Core
 
             try
             {
-                if (volume <= 0.2f)
+                if (wavePlay.Volume <= 0.2f)
                 {
                     wavePlay.Volume = 0.2f;
                     volume = 0.2f;
                 }
 
-                wavePlay.Volume -= 0.2f;
-                volume -= 0.2f;
+                wavePlay.Volume -= 0.1f;
+                volume -= 0.1f;
 
                 return wavePlay.Volume;
             }
