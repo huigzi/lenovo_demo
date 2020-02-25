@@ -198,18 +198,6 @@ namespace Algorithm
         public (short[], short[]) Int16PreProcess((short[], short[]) data)
         {
 
-            //ch1.Add(new short[1400]);
-            //ch2.Add(new short[1400]);
-
-            //int k = 0;
-
-            //for (int i = 0; i < bytes.Length; i = i + 4)
-            //{
-            //    ch1[2][k] = (short) BitConverter.ToUInt16(bytes, i);
-            //    ch2[2][k] = (short) BitConverter.ToUInt16(bytes, i + 2);
-            //    k++;
-            //}
-
             ch1.Add(data.Item1);
             ch2.Add(data.Item2);
 

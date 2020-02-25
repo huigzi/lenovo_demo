@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:local="clr-namespace:UI"
+        xmlns:core="clr-namespace:Core.ViewModel;assembly=Core"
         mc:Ignorable="d"
         Title="Demo" Height="300" Width="600" Loaded="Window_Loaded" Closing="Window_Closing">
+    <Window.Resources>
+        <core:Converter x:Key="MyConverter"/>
+    </Window.Resources>
 
     <Grid Background="#F5F6FA">
             <Grid.RowDefinitions>
@@ -61,6 +65,7 @@
             <Button Width="20" x:Name="TestButton" Command="{Binding ScrollLeftCommand}"/>
             <Label Width="100" Content="{Binding Status}" VerticalAlignment="Center" FontSize="26"/>
         </StackPanel>
+        <Border Grid.Row="0" Grid.RowSpan="3" Background="Black" Visibility="{Binding BackGround, Converter = {StaticResource MyConverter}}"/>
     </Grid>
 
 

@@ -53,6 +53,8 @@ namespace Core
         {
             if (state == lastState) return;
 
+            mainViewModel.BackGround = (int)state;
+
             switch (state)
             {
                 case State.DoubleClickMiddle:

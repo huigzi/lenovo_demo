@@ -22,6 +22,7 @@ namespace Core.ViewModel
         public MainViewModel(ISaveData<byte[]> saveData)
         {
             this.saveData = saveData;
+            BackGround = 5;
 
             ModelsInitial();
             ScrollLeftCommand = new RelayCommand(ScrollLeft);
@@ -60,6 +61,17 @@ namespace Core.ViewModel
             }
         }
 
+        private int backGround;
+
+        public int BackGround
+        {
+            get => backGround;
+            set
+            {
+                backGround = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public RelayCommand ScrollLeftCommand { get; set; }
         public RelayCommand ScrollRightCommand { get; set; }
