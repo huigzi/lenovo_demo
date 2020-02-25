@@ -24,32 +24,46 @@ namespace Core
         {
             if (wavePlay == null) throw new NullReferenceException("wavePlay not found");
 
-            if (volume >= 0.8f)
+            try
             {
-                wavePlay.Volume = 0.8f;
-                volume = 0.8f;
+                if (volume >= 0.8f)
+                {
+                    wavePlay.Volume = 0.8f;
+                    volume = 0.8f;
+                }
+
+                wavePlay.Volume += 0.2f;
+                volume += 0.2f;
+
+                return wavePlay.Volume;
             }
-
-            wavePlay.Volume += 0.2f;
-            volume += 0.2f;
-
-            return wavePlay.Volume;
+            catch (Exception e)
+            {
+                return volume;
+            }
         }
 
         public float DownVolume()
         {
             if (wavePlay == null) throw new NullReferenceException("wavePlay not found");
 
-            if (volume <= 0.2f)
+            try
             {
-                wavePlay.Volume = 0.2f;
-                volume = 0.2f;
+                if (volume <= 0.2f)
+                {
+                    wavePlay.Volume = 0.2f;
+                    volume = 0.2f;
+                }
+
+                wavePlay.Volume -= 0.2f;
+                volume -= 0.2f;
+
+                return wavePlay.Volume;
             }
-
-            wavePlay.Volume -= 0.2f;
-            volume -= 0.2f;
-
-            return wavePlay.Volume;
+            catch (Exception e)
+            {
+                return volume;
+            }
         }
 
         public void Play(string musicFullPath)
