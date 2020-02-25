@@ -40,6 +40,7 @@ namespace Algorithm
         private readonly int dev_thref;
         private readonly int non_thre;
         private readonly int backd;
+        private readonly int dx;
         private readonly float R;
         private readonly float dc_thre;
         private readonly float pdiff_thre;
@@ -124,6 +125,9 @@ namespace Algorithm
             dev_thref = configurationData.ConfigurationGroupInt["dev_thref"];
             non_thre = configurationData.ConfigurationGroupInt["non_thre"];
             backd = configurationData.ConfigurationGroupInt["backd"];
+            dx = configurationData.ConfigurationGroupInt["dx"];
+
+
             R = configurationData.ConfigurationGroupFloat["R"];
             dc_thre = configurationData.ConfigurationGroupFloat["dc_thre"];
             pdiff_thre = configurationData.ConfigurationGroupFloat["pdiff_thre"];
@@ -426,8 +430,40 @@ namespace Algorithm
                 }
             }
 
-            var track1Mf = trackline.Item1.MedianFilter(fp).GetRange(fp, track_len - 2 * fp);
-            var track2Mf = trackline.Item2.MedianFilter(fp).GetRange(fp, track_len - 2 * fp);
+            var medianFilterResult1 = trackline.Item1.MedianFilter(fp);
+            var medianFilterResult2 = trackline.Item2.MedianFilter(fp);
+
+            var med1 = medianFilterResult1.OrderBy(x => x).ToList()[medianFilterResult1.Count() / 2];
+            var min1 = medianFilterResult1.Min();
+
+            if (med1 - min1 > 10)
+            {
+                for(int i = 0; i < medianFilterResult1.Count; i++)
+                {
+                    if (medianFilterResult1[i] > med1 + dx)
+                    {
+                        medianFilterResult1[i] = med1 + dx;
+                    }
+                }
+            }
+
+            var med2 = medianFilterResult2.OrderBy(x => x).ToList()[medianFilterResult2.Count() / 2];
+            var min2 = medianFilterResult2.Min();
+
+            if (med2 - min2 > 10)
+            {
+                for (int i = 0; i < medianFilterResult2.Count; i++)
+                {
+                    if (medianFilterResult2[i] > med2 + dx)
+                    {
+                        medianFilterResult2[i] = med2 + dx;
+                    }
+                }
+            }
+
+            var track1Mf = medianFilterResult1.GetRange(fp, track_len - 2 * fp);
+            var track2Mf = medianFilterResult1.GetRange(fp, track_len - 2 * fp);
+
 
             var rref1Temp = track1Mf.GetRange(0, ref_lenl).OrderByDescending(x => x).ToArray();
 

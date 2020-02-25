@@ -29,7 +29,8 @@
     "backd": 5,
     "flt_edge": 30,
     "pd_thre1": 20,
-    "pd_thre2": 20 
+    "pd_thre2": 20,
+    "dx": 5 
   },
   "ConfigurationGroupFloat": {
     "eu": 0.095555555555556,

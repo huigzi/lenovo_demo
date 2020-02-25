@@ -22,7 +22,8 @@ namespace AlgorithmTests
 
             var method = new GestureAndPresenceMethod(readConfiguration);
 
-            var process = new AlgorithmFlow(method, readConfiguration);
+            var process =
+                new AlgorithmFlow(method, readConfiguration, new Core.ViewModel.MainViewModel(new SaveData()));
 
             for (int i = 0; i < ch1Data.ColumnCount; i++)
             {
