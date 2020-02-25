@@ -438,7 +438,7 @@ namespace Algorithm
 
             if (med1 - min1 > 10)
             {
-                for(int i = 0; i < medianFilterResult1.Count; i++)
+                for (int i = 0; i < medianFilterResult1.Count; i++)
                 {
                     if (medianFilterResult1[i] > med1 + dx)
                     {
@@ -462,8 +462,7 @@ namespace Algorithm
             }
 
             var track1Mf = medianFilterResult1.GetRange(fp, track_len - 2 * fp);
-            var track2Mf = medianFilterResult1.GetRange(fp, track_len - 2 * fp);
-
+            var track2Mf = medianFilterResult2.GetRange(fp, track_len - 2 * fp);
 
             var rref1Temp = track1Mf.GetRange(0, ref_lenl).OrderByDescending(x => x).ToArray();
 
