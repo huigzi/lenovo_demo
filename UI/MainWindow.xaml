@@ -5,12 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:local="clr-namespace:UI"
-        xmlns:core="clr-namespace:Core.ViewModel;assembly=Core"
+        xmlns:viewmodel="clr-namespace:Core.ViewModel;assembly=Core"
+        xmlns:core="clr-namespace:Core;assembly=Core"
+        xmlns:interactive="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         Title="Demo" Height="300" Width="600" Loaded="Window_Loaded" Closing="Window_Closing">
     <Window.Resources>
-        <core:Converter x:Key="MyConverter"/>
+        <viewmodel:Converter x:Key="MyConverter"/>
     </Window.Resources>
+    <interactive:Interaction.Behaviors>
+        <core:ValidationExceptionBehavior/>
+    </interactive:Interaction.Behaviors>
 
     <Grid Background="#F5F6FA">
             <Grid.RowDefinitions>
@@ -62,8 +67,16 @@
                      Width="300" VerticalAlignment="Center" Margin="50,0,0,0"
                      TickPlacement="TopLeft"
                      Ticks="0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1"/>
-            <Button Width="20" x:Name="TestButton" Command="{Binding ScrollLeftCommand}"/>
+            <Button Width="50" x:Name="TestButton" Command="{Binding ScrollLeftCommand}"/>
             <Label Width="100" Content="{Binding Status}" VerticalAlignment="Center" FontSize="26"/>
+            <TextBlock Width="200" Height="30">
+                <TextBlock.Text>
+                    <Binding Path="Name" NotifyOnValidationError="True" UpdateSourceTrigger="PropertyChanged"/>
+                    <!--<Binding.ValidationRules>
+                        <core:NotEmptyValidationgRule/>
+                    </Binding.ValidationRules>-->
+                </TextBlock.Text>
+            </TextBlock>
         </StackPanel>
         <Border Grid.Row="0" Grid.RowSpan="3" Background="Black" Visibility="{Binding BackGround, Converter = {StaticResource MyConverter}}"/>
     </Grid>

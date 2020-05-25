@@ -1,0 +1,30 @@
+{
+  "id": "1718937",
+  "name": "手势",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "239499",
+      "name": "手势双指双击",
+      "font_class": "shoushishuangzhishuangji",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "240058",
+      "name": "手势四指右划",
+      "font_class": "shoushisizhiyouhua",
+      "unicode": "e61b",
+      "unicode_decimal": 58907
+    },
+    {
+      "icon_id": "240072",
+      "name": "手势四指左划",
+      "font_class": "shoushisizhizuohua",
+      "unicode": "e620",
+      "unicode_decimal": 58912
+    }
+  ]
+}

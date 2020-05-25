@@ -4,7 +4,7 @@ using System.Threading.Tasks.Dataflow;
 
 namespace Core
 {
-    public class DataFlowBlock
+    public class DataFlowBlock : IDataFlow
     {
         private TransformBlock<byte[], byte[]> _transformBlock1;
         private TransformBlock<byte[], State> _transformBlock2;
@@ -17,7 +17,7 @@ namespace Core
             _transformBlock2 = new TransformBlock<byte[], State>(x =>
             {
 
-                if(initialFlag < 2)
+                if (initialFlag < 2)
                 {
                     algorithmFlow.DataInitial(x);
 
@@ -38,7 +38,7 @@ namespace Core
 
         public void Post(byte[] data)
         {
-            _transformBlock2.Post(data);
+            _transformBlock1.Post(data);
         }
     }
 }

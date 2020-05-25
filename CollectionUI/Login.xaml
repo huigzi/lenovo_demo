@@ -1,0 +1,33 @@
+﻿<Window x:Class="CollectionUI.Login"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CollectionUI"
+        mc:Ignorable="d"
+        Title="Login" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+    <Grid Background="#009FE1">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Margin="50,0,50,0">
+            <TextBlock Text="输入姓名:"  FontSize="50" FontFamily="微软雅黑" Foreground="White" Margin="10" VerticalAlignment="Center"/>
+            <TextBox x:Name="NameText" Width="400" Height="70" Margin="20, 20, 10, 20"  FontSize="50" FontFamily="微软雅黑" 
+                     VerticalContentAlignment="Center" Foreground="#009FE1" HorizontalContentAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="50,0,50,0">
+            <TextBlock Text="存储地址:"  FontSize="50" FontFamily="微软雅黑" Foreground="White" Margin="10" VerticalAlignment="Center"/>
+            <TextBox x:Name="PathText" Width="400" Height="70" Margin="20, 20, 10, 20"  FontSize="20" FontFamily="微软雅黑" 
+                     Foreground="#009FE1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextWrapping="WrapWithOverflow"/>
+        </StackPanel>
+
+        <UniformGrid Columns="3" Grid.Row="2">
+            <Button Height="50" Width="150" Content="选择存储文件夹" FontFamily="微软雅黑" Foreground="White" Background="#009FE1" Click="Button_Click"/>
+            <Button Height="50" Width="150" Content="确定" FontFamily="微软雅黑" Foreground="White" Background="#009FE1" Click="Button_Click_1"/>
+            <Button Height="50" Width="150" Content="取消" FontFamily="微软雅黑" Foreground="White" Background="#009FE1" Click="Button_Click_2"/>
+        </UniformGrid>
+    </Grid>
+</Window>

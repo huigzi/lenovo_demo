@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgorithmTests", "Algorithm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UITests", "UITests\UITests.csproj", "{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CollectionUI", "CollectionUI\CollectionUI.csproj", "{F0BD28A2-C290-4A1C-9B09-15C7CBF64AD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,14 @@ Global
 		{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}.Release|x64.ActiveCfg = Release|Any CPU
 		{F80655D6-6DA2-4983-B15C-ABB91CA8A84E}.Release|x64.Build.0 = Release|Any CPU
+		{F0BD28A2-C290-4A1C-9B09-15C7CBF64AD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0BD28A2-C290-4A1C-9B09-15C7CBF64AD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0BD28A2-C290-4A1C-9B09-15C7CBF64AD8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F0BD28A2-C290-4A1C-9B09-15C7CBF64AD8}.Debug|x64.Build.0 = Debug|Any CPU
+		{F0BD28A2-C290-4A1C-9B09-15C7CBF64AD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0BD28A2-C290-4A1C-9B09-15C7CBF64AD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0BD28A2-C290-4A1C-9B09-15C7CBF64AD8}.Release|x64.ActiveCfg = Release|Any CPU
+		{F0BD28A2-C290-4A1C-9B09-15C7CBF64AD8}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

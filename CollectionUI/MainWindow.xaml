@@ -1,0 +1,100 @@
+﻿<Window x:Class="CollectionUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CollectionUI"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+    <Grid x:Name="Grid" Background="#009FE1">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Canvas>
+            <TextBlock x:Name="RightMoveText" Text="&#xe61b;" FontFamily="Fonts/#iconfont" FontSize="70" 
+                       Foreground="Red" Canvas.Top="20" Canvas.Left="20" Opacity="0">
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="Border.MouseDown">
+                        <BeginStoryboard>
+                            <Storyboard x:Name="RightMove">
+                                <DoubleAnimation Duration="0:0:3" From="0" To="1" 
+                                                 Storyboard.TargetName="RightMoveText" Storyboard.TargetProperty="Opacity" AutoReverse="True"/>
+                                <DoubleAnimation Duration="0:0:3" From="20" To="700" 
+                                                 Storyboard.TargetName="RightMoveText" Storyboard.TargetProperty="(Canvas.Left)"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </TextBlock.Triggers>
+            </TextBlock>
+
+            <TextBlock  x:Name="LeftMoveText" Text="&#xe620;" FontFamily="Fonts/#iconfont" FontSize="70" 
+                        Foreground="Red" Canvas.Top="20" Canvas.Left="700" Opacity="0">
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="Border.MouseDown">
+                        <BeginStoryboard>
+                            <Storyboard x:Name="LeftMove">
+                                <DoubleAnimation Duration="0:0:3" From="0" To="1" 
+                                                 Storyboard.TargetName="LeftMoveText" Storyboard.TargetProperty="Opacity" AutoReverse="True"/>
+                                <DoubleAnimation Duration="0:0:3" From="700" To="20" 
+                                                 Storyboard.TargetName="LeftMoveText" Storyboard.TargetProperty="(Canvas.Left)"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </TextBlock.Triggers>
+            </TextBlock>
+
+            <TextBlock x:Name="LeftDoubleText" Text="&#xe609;" FontFamily="Fonts/#iconfont" FontSize="70" 
+                       Foreground="Red" Canvas.Top="20" Canvas.Left="60" Opacity="0">
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="Border.MouseDown">
+                        <BeginStoryboard>
+                            <Storyboard x:Name="LeftDouble">
+                                <DoubleAnimation Duration="0:0:1.5" From="0" To="1" 
+                                                 Storyboard.TargetName="LeftDoubleText" Storyboard.TargetProperty="Opacity" AutoReverse="True"/>
+                                <DoubleAnimation BeginTime="0:0:1.5" Duration="0:0:1.5" From="0" To="1" 
+                                                 Storyboard.TargetName="LeftDoubleText" Storyboard.TargetProperty="Opacity" AutoReverse="True"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </TextBlock.Triggers>
+            </TextBlock>
+
+            <TextBlock x:Name="RightDoubleText" Text="&#xe609;" FontFamily="Fonts/#iconfont" FontSize="70" 
+                       Foreground="Red" Canvas.Top="20" Canvas.Left="660" Opacity="0">
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="Border.MouseDown">
+                        <BeginStoryboard>
+                            <Storyboard x:Name="RightDouble">
+                                <DoubleAnimation Duration="0:0:1.5" From="0" To="1" 
+                                                 Storyboard.TargetName="RightDoubleText" Storyboard.TargetProperty="Opacity" AutoReverse="True"/>
+                                <DoubleAnimation BeginTime="0:0:1.5" Duration="0:0:1.5" From="0" To="1" 
+                                                 Storyboard.TargetName="RightDoubleText" Storyboard.TargetProperty="Opacity" AutoReverse="True"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </TextBlock.Triggers>
+            </TextBlock>
+        </Canvas>
+
+        <TextBlock x:Name="PreText" Grid.Row="1" Text="{Binding PresentWord, UpdateSourceTrigger=PropertyChanged}" FontSize="50" FontFamily="微软雅黑" Foreground="White" 
+                   VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold">
+            <TextBlock.Triggers>
+                <EventTrigger RoutedEvent="Window.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard x:Name="Fade">
+                            <DoubleAnimation Duration="0:0:2" From="0" To="1" 
+                                             Storyboard.TargetName="PreText" Storyboard.TargetProperty="Opacity" 
+                                             Completed="DoubleAnimation_Completed"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </TextBlock.Triggers>
+        </TextBlock>
+        <TextBlock x:Name="CountText" Grid.Row="2" Text="{Binding CountWord, UpdateSourceTrigger=PropertyChanged}" FontSize="70"
+                   FontFamily="微软雅黑" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
+        <Slider HorizontalAlignment="Left" Margin="-224,82,0,0" VerticalAlignment="Top"/>
+    </Grid>
+</Window>

@@ -13,5 +13,6 @@ namespace Core.Interface
         void StartSave();
         void StopSave();
         T WriteData(T bytes);
+        void WriteProcess(T bytes);
     }
 }

@@ -5,13 +5,14 @@ using Core.Entity;
 using Core.Interface;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using OxyPlot;
 
 namespace Core.ViewModel
 {
     /// <summary>
     /// This class contains properties that the main View can data bind to.
-    public class MainViewModel : ViewModelBase
+    public class MainViewModel : ViewModelBase, IValidationExceptionHandler
     {
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -23,18 +24,47 @@ namespace Core.ViewModel
         {
             this.saveData = saveData;
             BackGround = 5;
+            presentWord = "开始手势采集，准备好了嘛";
+            countWord = string.Empty;
 
             ModelsInitial();
             ScrollLeftCommand = new RelayCommand(ScrollLeft);
             ScrollRightCommand = new RelayCommand(ScrollRight);
             SaveDataCommand = new RelayCommand(SaveData);
             dispatcher = Dispatcher.CurrentDispatcher;
+
+            Messenger.Default.Register<string>(this, "PresentUpdate", PresentUpdate);
+            Messenger.Default.Register<string>(this, "PresentUpdate2", PresentUpdate2);
         }
 
         public ObservableCollection<MusicModel> MusicModels { get; set; }
 
         public IList<DataPoint> Points1 { get; set; }
         public IList<DataPoint> Points2 { get; set; }
+
+        private string presentWord;
+
+        public string PresentWord
+        {
+            get => presentWord;
+            set
+            {
+                presentWord = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private string countWord;
+
+        public string CountWord
+        {
+            get => countWord;
+            set
+            {
+                countWord = value;
+                RaisePropertyChanged();
+            }
+        }
 
 
         private float volume;
@@ -73,9 +103,43 @@ namespace Core.ViewModel
             }
         }
 
+        private bool isValid;
+
+        public bool IsValid
+        {
+            get => isValid;
+            set
+            {
+                isValid = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private string name;
+
+        public string Name
+        {
+            get => name;
+            set
+            {
+                name = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public RelayCommand ScrollLeftCommand { get; set; }
         public RelayCommand ScrollRightCommand { get; set; }
         public RelayCommand SaveDataCommand { get; set; }
+
+        private void PresentUpdate(string message)
+        {
+            PresentWord = message;
+        }
+
+        private void PresentUpdate2(string count)
+        {
+            CountWord = count;
+        }
 
         private void ModelsInitial()
         {

@@ -12,9 +12,9 @@ namespace Core
         private UsbEndpointReader reader;
         private readonly ILogger logger;
         
-        private readonly DataFlowBlock transformBlock;
+        private readonly IDataFlow transformBlock;
 
-        public UsbServer(DataFlowBlock transformBlock, ILogger logger)
+        public UsbServer(IDataFlow transformBlock, ILogger logger)
         {
             myUsbFinder = new UsbDeviceFinder(0x0483, 0x572B);
             this.transformBlock = transformBlock;
